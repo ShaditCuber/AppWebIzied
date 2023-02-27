@@ -7,6 +7,8 @@ urlpatterns = [
     path("añadir/",addProduct,name="add"),
     path("borrar/<int:pk>",deleteProduct,name="borrar"),
     path("actualizar/<int:pk>",updateProduct,name="actualizar"),
+    path("dashboard",dashboard,name="dashboard"),
+    
 
     
     

@@ -1,6 +1,6 @@
 {% extends '../layout.html' %}
 {% block content %}
-<div class="content-section">
+<div class="content-section ">
     <a href="{% url 'add'%}" class="btn btn-success btn-sm mb-2">Añadir</a>
     <div class="col">
         <div class="card-body">
@@ -10,15 +10,15 @@
             </form>
         </div>
     </div>
-    <table class="table table-striped table-bordered table-hoved">
+    <table class="table table-striped table-bordered table-hoved table-dark table-responsive">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Nombre</th>
-                <th scope="col">Precio ($)</th>
+                <th scope="col">Precio</th>
                 <th scope="col">Stock</th>
-                <th scope="col">Fecha de Insercion</th>
-                <th scope="col">Fecha de Actualizacion</th>
+                <th scope="col" class="d-none d-lg-table-cell">Fecha de Insercion</th>
+                <th scope="col" class="d-none d-lg-table-cell">Fecha de Actualizacion</th>
                 <th scope="col">Actualizar</th>
                 <th scope="col">Borrar</th>
 
@@ -33,8 +33,8 @@
                 <th scope="row">{{inventory.name}}</th>
                 <th scope="row">{{inventory.price}}</th>
                 <th scope="row">{{inventory.stock}}</th>
-                <th scope="row">{{inventory.creationDate}}</th>
-                <th scope="row">{{inventory.updateDate}}</th>
+                <th scope="row" class="d-none d-lg-table-cell">{{inventory.creationDate | date:"d/m/Y"}}</th>
+                <th scope="row" class="d-none d-lg-table-cell">{{inventory.updateDate | date:"d/m/Y"}}</th>
                 <th><a href="{% url 'actualizar' inventory.id %}" class="btn btn-success btn-sm mb-2">Actualizar</a>
                 </th>
                 <th scope="row"><a href="{% url 'borrar' inventory.id %}" class="btn btn-danger btn-sm mb-2">Borrar</a>
