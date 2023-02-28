@@ -31,19 +31,17 @@ class añadir(forms.Form):
         required=True,
         help_text="bodega",
         label="Bodega",
-        to_field_name="idWarehouse" # opcional si desea utilizar el campo 'id' como valor de la opción en lugar del objeto completo
+        to_field_name="id" # opcional si desea utilizar el campo 'id' como valor de la opción en lugar del objeto completo
     )
-    # class Meta:
-    #     model = Inventory
-    #     fields = ["name", "price", "stock"]
-    #     help_texts ={k:"" for k in fields}
+    class Meta:
+        model = Inventory
+        fields = ["code", "name", "priceUnit","resume","idWarehouse"]
+        help_texts ={k:"" for k in fields}
         
         
         
 class actualizar(ModelForm):
     
-   
-
     nameProduct = forms.CharField(
         label="Nombre",
         widget=forms.TextInput(attrs={'class': 'form-control'})
@@ -66,10 +64,23 @@ class actualizar(ModelForm):
         required=True,
         help_text="bodega",
         label="Bodega",
-        to_field_name="idWarehouse" # opcional si desea utilizar el campo 'id' como valor de la opción en lugar del objeto completo
+        to_field_name="id" # opcional si desea utilizar el campo 'id' como valor de la opción en lugar del objeto completo
     )
 
     class Meta:
         model = Inventory
         fields = ["nameProduct", "priceUnit","resume","idWarehouse"]
         help_texts ={k:"" for k in fields}
+        
+        
+class añadirBodega(ModelForm):
+    name = forms.CharField(
+        label="Nombre Bodega",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = warehouse
+        fields = ["name"]
+        help_texts ={k:"" for k in fields}
+        excluded="code"

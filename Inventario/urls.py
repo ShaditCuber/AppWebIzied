@@ -8,5 +8,9 @@ urlpatterns = [
     path("borrar/<pk>",deleteProduct,name="borrar"),
     path("actualizar/<pk>",updateProduct,name="actualizar"),
     path("bodegas/",bodegaList,name="bodegas"),
+    path("addBodega/",addBodega,name="addBodega"),
+    path("deleteBodega/<pk>",deleteBodega,name="deleteBodega"),
+    
+    
     path("dashboard",dashboard,name="dashboard"),
 ]

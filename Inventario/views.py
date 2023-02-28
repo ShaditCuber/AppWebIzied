@@ -29,7 +29,6 @@ def xProductView(request,pk):
 
 
 def addProduct(request):
-            
     if request.method=="POST":
         addForm=añadir(request.POST)
         if addForm.is_valid():
@@ -44,7 +43,7 @@ def addProduct(request):
                     )
             producto.save()
             messages.success(request,"Producto Añadido Correctamente")
-            return redirect('/productos/ ')
+            return redirect('/productos/')
     else:
         addForm=añadir()
         
@@ -55,7 +54,7 @@ def deleteProduct(request,pk):
     inventory=get_object_or_404(Inventory,pk=pk)
     inventory.delete()
     messages.success(request,"Producto Eliminado Correctamente")
-    return redirect("/productos/ ")
+    return redirect("/productos/")
 
 def updateProduct(request,pk):
     inventory=get_object_or_404(Inventory,pk=pk)
@@ -82,6 +81,29 @@ def bodegaList(request):
     context={"title":"Lista Bodegas","bodegas":bodegas}
     return render(request,"Inventario/bodegaList.html",context=context)
     
+
+def addBodega(request):
+    if request.method=="POST":
+        addForm=añadirBodega(request.POST)
+        if addForm.is_valid():
+            informacion = addForm.cleaned_data
+            bodega = warehouse(
+                    nameWarehouse=informacion['name'],
+                    )
+            bodega.save()
+            messages.success(request,"Bodega Añadida Correctamente")
+            return redirect('/bodegas/')
+    else:
+        addForm=añadirBodega()
+        
+    return render(request,"Inventario/addBodega.html",{"form":addForm})
+
+
+def deleteBodega(request,pk):
+    warehous=get_object_or_404(warehouse,pk=pk)
+    warehous.delete()
+    messages.success(request,"Bodega Eliminada Correctamente")
+    return redirect("/bodegas/")
 
 def dashboard(request):
     inventories=Inventory.objects.all()
