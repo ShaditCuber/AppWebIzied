@@ -21,5 +21,5 @@ class Inventory(models.Model):
         return self.name
     
 class Inventario(models.Model):
-    name = models.CharField(max_length=100,null=False,blank=False)
+    code = models.ForeignKey(Inventory,blank=True,null=False,on_delete=models.CASCADE)
     stock=models.IntegerField(null=False,blank=False)
