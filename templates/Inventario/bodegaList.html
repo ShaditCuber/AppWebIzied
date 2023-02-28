@@ -1,0 +1,24 @@
+{% extends '../layout.html' %}
+{% block content %}
+<div class="content-section ">
+    <!-- modificar para bodegas -->
+    <a href="{% url 'add'%}" class="btn btn-success btn-sm mb-2">Añadir</a>
+
+    <table class="table table-striped table-bordered table-hoved table-dark table-responsive">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Code</th>
+                <th scope="col">Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bodega in bodegas %}
+            <tr style="cursor:pointer;cursor: hand;">
+                <th scope="row">{{bodega.id}}</th>
+                <th scope="row">{{bodega.nameWarehouse}}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

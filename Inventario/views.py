@@ -19,7 +19,7 @@ def inventoryList(request):
     filtro=OrderFilter(request.GET,queryset=inventories)
     inventories=filtro.qs
     context={"title":"Lista Inventario","inventories":inventories,"filtro":filtro}
-    return render(request,"Inventario/inventario.html",context=context)
+    return render(request,"Inventario/listaProductos.html",context=context)
 
 
 def xProductView(request,pk):
@@ -35,12 +35,16 @@ def addProduct(request):
         if addForm.is_valid():
             informacion = addForm.cleaned_data
             producto = Inventory(
-                    name=informacion['name'],
-                    price = informacion['price'],
-                    stock = informacion['stock'])
+                    nameProduct=informacion['name'],
+                    priceUnit = informacion['priceUnit'],
+                    code = informacion['code'],
+                    resume = informacion['resume'],
+                    idWarehouse = informacion['idWarehouse'],
+                    
+                    )
             producto.save()
             messages.success(request,"Producto Añadido Correctamente")
-            return redirect('/inventario/')
+            return redirect('/productos/ ')
     else:
         addForm=añadir()
         
@@ -51,16 +55,17 @@ def deleteProduct(request,pk):
     inventory=get_object_or_404(Inventory,pk=pk)
     inventory.delete()
     messages.success(request,"Producto Eliminado Correctamente")
-    return redirect("/inventario/")
+    return redirect("/productos/ ")
 
 def updateProduct(request,pk):
     inventory=get_object_or_404(Inventory,pk=pk)
+    print(inventory)
     if request.method=="POST":
         updateForm=actualizar(data=request.POST)
         if updateForm.is_valid():
-            inventory.name=updateForm.data['name']
-            inventory.price=updateForm.data['price']
-            inventory.stock=updateForm.data['stock']
+            inventory.nameProduct=updateForm.data['nameProduct']
+            inventory.priceUnit=updateForm.data['priceUnit']
+            inventory.resume=updateForm.data['resume']
             inventory.save()
             messages.success(request,"Producto Actualizado Correctamente")
             
@@ -71,6 +76,12 @@ def updateProduct(request,pk):
     return render(request,"Inventario/updateProducto.html",{"form":updateForm})
 
 
+
+def bodegaList(request):
+    bodegas=warehouse.objects.all()
+    context={"title":"Lista Bodegas","bodegas":bodegas}
+    return render(request,"Inventario/bodegaList.html",context=context)
+    
 
 def dashboard(request):
     inventories=Inventory.objects.all()

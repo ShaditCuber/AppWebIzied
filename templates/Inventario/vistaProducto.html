@@ -2,6 +2,15 @@
 {% block content %}
 <div class="content-section">
     <div class="row mx-auto justify-content-center">
+        <div class="card m-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-center">Codigo Producto</h5>
+                <div style="font-size: 30px;" class="text-center">
+                    <span><i class='fa fa-barcode'></i></span>
+                </div>
+                <h3 class="text-center">{{ inventory.code }}</h6>
+            </div>
+        </div>
 
         <div class="card m-4" style="width: 18rem;">
             <div class="card-body">
@@ -9,17 +18,17 @@
                 <div style="font-size: 30px;" class="text-center">
                     <span><i class="fab fa-product-hunt"></i></span>
                 </div>
-                <h3 class="text-center">{{ inventory.name }}</h6>
+                <h3 class="text-center">{{ inventory.nameProduct }}</h6>
             </div>
         </div>
 
         <div class="card m-4" style="width: 18rem;">
             <div class="card-body">
-                <h5 class="card-title text-center">Stock</h5>
+                <h5 class="card-title text-center">Descripcion</h5>
                 <div style="font-size: 30px;" class="text-center">
-                    <span><i class="fas fa-warehouse"></i></span>
+                    <span><i class='fa fa-file'></i></span>
                 </div>
-                <h3 class="text-center">{{ inventory.stock }}</h6>
+                <h3 class="text-center">{{ inventory.resume }}</h6>
             </div>
         </div>
 
@@ -29,7 +38,7 @@
                 <div style="font-size: 30px;" class="text-center">
                     <span><i class="fas fa-dollar-sign"></i></span>
                 </div>
-                <h3 class="text-center">{{ inventory.price }}</h6>
+                <h3 class="text-center">{{ inventory.priceUnit }}</h6>
             </div>
         </div>
 
@@ -37,7 +46,7 @@
             <div class="card-body">
                 <h5 class="card-title text-center">Fecha de Creacion</h5>
                 <div style="font-size: 30px;" class="text-center">
-                    <span><i class="fas fa-dollar-sign"></i></span>
+                    <span><i class="fas fa-calendar-alt"></i></span>
                 </div>
                 <h3 class="text-center">{{ inventory.creationDate | date:"d/m/Y "}}</h6>
             </div>

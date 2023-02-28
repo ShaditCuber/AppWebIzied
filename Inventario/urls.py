@@ -2,15 +2,11 @@ from django.urls import path
 from .views import *
 urlpatterns = [
     path("",index,name="index"),
-    path("inventario/",inventoryList,name="inventario"),
-    path("producto/<int:pk>",xProductView,name="xProductView"),
+    path("productos/",inventoryList,name="productos"),
+    path("producto/<pk>",xProductView,name="xProductView"),
     path("añadir/",addProduct,name="add"),
-    path("borrar/<int:pk>",deleteProduct,name="borrar"),
-    path("actualizar/<int:pk>",updateProduct,name="actualizar"),
+    path("borrar/<pk>",deleteProduct,name="borrar"),
+    path("actualizar/<pk>",updateProduct,name="actualizar"),
+    path("bodegas/",bodegaList,name="bodegas"),
     path("dashboard",dashboard,name="dashboard"),
-    
-
-    
-    
-
 ]

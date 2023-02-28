@@ -3,23 +3,24 @@ from django.db import models
 
 
 class warehouse(models.Model):
-    idWarehouse=models.CharField(max_length=100,null=False,blank=False,primary_key=True)
-    name=models.CharField(max_length=100,null=False,blank=False)
+    nameWarehouse=models.CharField(max_length=100,null=False,blank=False)
 
+    def __str__(self) -> str:
+        return self.nameWarehouse
+    
 class Inventory(models.Model):
+    
     code=models.CharField(max_length=100,null=False,blank=False,primary_key=True)
-    name = models.CharField(max_length=100,null=False,blank=False)
+    nameProduct = models.CharField(max_length=100,null=False,blank=False)
     priceUnit=models.IntegerField(null=False,blank=False)
     resume=models.CharField(max_length=500,null=False,blank=False)
-    # stock=models.IntegerField(null=False,blank=False)
-    # typeUnit=models.CharField(max_length=100,null=False,blank=False)
     creationDate=models.DateField(auto_now_add=True)
     updateDate=models.DateField(auto_now=True)
-    idWarehouse=models.ForeignKey(warehouse,blank=True,null=False,on_delete=models.CASCADE)
+    idWarehouse=models.ForeignKey(warehouse,blank=True,null=False,on_delete=models.CASCADE,default="")
     
     def __str__(self) -> str:
-        return self.name
+        return self.code
     
 class Inventario(models.Model):
-    code = models.ForeignKey(Inventory,blank=True,null=False,on_delete=models.CASCADE)
+    code = models.ForeignKey(Inventory,blank=True,null=False,on_delete=models.CASCADE,default="")
     stock=models.IntegerField(null=False,blank=False)
