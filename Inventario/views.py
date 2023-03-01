@@ -7,6 +7,7 @@ from .filters import *
 import plotly
 import plotly.express as px
 import json
+from .laudus import *
 # Create your views here.
 
 def index(request):
@@ -39,7 +40,6 @@ def addProduct(request):
                     code = informacion['code'],
                     resume = informacion['resume'],
                     idWarehouse = informacion['idWarehouse'],
-                    
                     )
             producto.save()
             messages.success(request,"Producto Añadido Correctamente")
@@ -106,9 +106,9 @@ def adInventario(request):
                     product=informacion['producto'],
                     quantity=informacion['cantidad'],
                     type=informacion['type'],
-                    
-                    
+                    pro=informacion['pro'],
                     )
+            
             inventario.save()
             messages.success(request,"Inventario Añadida Correctamente")
             return redirect('/inventario/')
@@ -141,20 +141,21 @@ def deleteBodega(request,pk):
     return redirect("/bodegas/")
 
 def dashboard(request):
-    inventories=Inventory.objects.all()
-    df= read_frame(inventories)
-    name_stock = df.groupby(by="nameProduct").sum().sort_values(by="stock")
+    stocks = Stock.objects.all()
+
+    df= read_frame(stocks)
+    name_stock = df.groupby(by="product").sum().sort_values(by="quantity")
     nameStock = px.bar(name_stock, 
                                     x = name_stock.index, 
-                                    y = name_stock.stock, 
+                                    y = name_stock.quantity, 
                                     title="Nombre Stock"
                                 )
     nameStock = json.dumps(nameStock, cls=plotly.utils.PlotlyJSONEncoder)
     
-    most_product_in_stock_df = df.groupby(by="name").sum().sort_values(by="stock")
+    most_product_in_stock_df = df.groupby(by="product").sum().sort_values(by="quantity")
     most_product_in_stock = px.pie(most_product_in_stock_df, 
                                     names = most_product_in_stock_df.index, 
-                                    values = most_product_in_stock_df.stock, 
+                                    values = most_product_in_stock_df.quantity, 
                                     title="Productos en Stock"
                                 )
     most_product_in_stock = json.dumps(most_product_in_stock, cls=plotly.utils.PlotlyJSONEncoder)

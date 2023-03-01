@@ -8,6 +8,8 @@
                 <th scope="col">Code</th>
                 <th scope="col">Cantidad</th>
                 <th scope="col">Tipo</th>
+                <th scope="col">Pro</th>
+
 
 
 
@@ -27,6 +29,7 @@
                     <span class="badge px-3 rounded-pill bg-primary bg-gradient">Entrada</span> {% else %}
                     <span class="badge px-3 rounded-pill bg-danger bg-gradient">Salida</span> {% endif %}
                 </th>
+                <th scope=" row">{{stock.pro}}</th>
             </tr>
             {% endfor %}
         </tbody>

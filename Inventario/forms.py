@@ -100,7 +100,10 @@ class addInventario(ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     type = forms.ChoiceField(choices=[('1','Entrada'),('2','Salida')])
+    pro=forms.CharField(label="Pro",
+        widget=forms.TextInput(attrs={'class': 'form-control'}),required=False)
+    
     class Meta:
         model = Stock
-        fields = ["producto", "cantidad","type"]
+        fields = ["producto", "cantidad","type","pro"]
         help_texts ={k:"" for k in fields}

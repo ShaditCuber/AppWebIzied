@@ -31,7 +31,6 @@ class Inventory(models.Model):
             else:
                 stockOut = int(stockOut) + int(stock.quantity)
         available  = stockIn - stockOut
-        print(stockIn,stockOut)
         return available
     
 class Stock(models.Model):
@@ -40,3 +39,4 @@ class Stock(models.Model):
     type = models.CharField(max_length=2,choices=(('1','Entrada'),('2','Salida')), default = 1)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True,blank=True,null=False)
+    pro=models.CharField(max_length=100,null=False,blank=False,default="")
