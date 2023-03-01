@@ -4,7 +4,7 @@ from django.db import models
 
 class warehouse(models.Model):
     nameWarehouse=models.CharField(max_length=100,null=False,blank=False)
-    
+    idLaudus=models.CharField(max_length=100,null=False,blank=False)
     def __str__(self) -> str:
         return self.nameWarehouse
     
@@ -17,7 +17,7 @@ class Inventory(models.Model):
     creationDate=models.DateField(auto_now_add=True)
     updateDate=models.DateField(auto_now=True,blank=True,null=False)
     idWarehouse=models.ForeignKey(warehouse,blank=True,null=False,on_delete=models.CASCADE,default="")
-    
+    idLaudus=models.IntegerField(null=False,blank=False)
     def __str__(self) -> str:
         return self.code
 

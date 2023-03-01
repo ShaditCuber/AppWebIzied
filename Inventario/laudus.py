@@ -1,6 +1,91 @@
+import requests
+import json
+import time
+import datetime
+HEADERS = {
+  'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoidEVoL0swZDh2Rnp6SU9QQm5xZld5OFJRRTdUb0hlN3pCTnQ3aHI4SHFHT3I2azJFS2FIeS9UOEZOdkxaVnhOOWFCb2J1dkZrY00xejgySTAvcU5hVUdtU0x0UmZYWUEvbjA1NjlReTZheGhyMlhiWFpJSjdvdGZicFQrV2krdzg1V1JTQXFwQXNVNWkyV1NPQlRadEg2NUlOWXpQSGMvcmJ3c3NPbWV1SW05TjlCUUt3ZG1qSVJ4ZEdsanlQcGpYMWF2MHk4eS9ZWkRTWFZJUWo5QjduR3RrSWVVRUZTMGFRUVk5eEMva3RJRE1YL0FpUWhMOHhwM09jOENHNXZYN25rUTdGTTlhM2Z5NDdUSlg5dnp5LzJRcnNla3dmZEdvTklmaDRwbmRTRVRxbGRQV1BtdGlFc1R4K1hBZU9YbmNqUy9XaXFhRmxGcHkyV0o0WGZEQlQxM28zdlhKTWtVZVo0cWRCTEhSS1B1WVJXV21aYXZXUnJFPSJ9.KjEkKB16cVe6TIaOFM76TUsbi-zscLbIudaOfyLvGao',
+  'Content-Type': 'application/json'
+}
+URL='https://api.laudus.cl/'
+def crearProducto(sku:str,description:str,unitPrice:int):
+    funcion='production/products'
+    payload = """{{
+    "sku": "{}",
+    "description": "{}",
+    "allowFreeDescription": "true",
+    "barCode": "{}",
+    "type": "s",
+    
+    "unitPrice": {},
+    "unitOfMeasure": "unidad",
+    "notes": "string",
+    "createdBy": {{
+        "userId": "st",
+        "name": "string"
+    }},
+    "modifiedBy": {{
+        "userId": "st",
+        "name": "string"
+        }}
+    }}""".format(sku, description, sku, unitPrice)
+    data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
+    time.sleep(5)
+    idProducto=data['productId']
+    return idProducto
+    
+
+    
+
+def eliminarProducto(idLaudus):
+    funcion='production/products/'+str(idLaudus)
+    requests.delete(URL+funcion,headers=HEADERS).text
+    
+    
+
+def crearBodega(nombre:str):
+    funcion='production/warehouses'
+    payload="""{{
+    "name": "{}",
+    "address": "Calle 2 Norte 376,Condominio Costa San Pedro",
+    "city": "San Pedro de la Paz",
+    "county": "Concepcion",
+    "notes": "",
+    "createdBy": {{
+        "userId": "st",
+        "name": "string"
+    }},
+    "modifiedBy": {{
+        "userId": "st",
+        "name": "string"
+    }},
+    }}""".format(nombre)
+    data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
+    return data['warehouseId']
+    
 
 
+def ingresoBodega(idWarehouse:str,idProduct:int,quantity:int):
+    
+    now = datetime.datetime.utcnow()
 
-
-def crearProducto():
-    pass
+    iso_date = now.isoformat() + 'Z'
+    print(iso_date)
+    funcion='production/inputs'
+    payload="""{{
+        "warehouse": {{
+            "warehouseId": '{}',
+        }},
+        "createdAt":{},
+        "items": [
+                {{
+                "product": {{
+                    "productId": {},
+                }},
+                "quantity": {},
+                }}
+                ]
+    }}""".format(str(idWarehouse),iso_date,idProduct,quantity)
+    data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
+    print(data)
+    
+ingresoBodega('00J',692,1)

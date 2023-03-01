@@ -34,12 +34,14 @@ def addProduct(request):
         addForm=añadir(request.POST)
         if addForm.is_valid():
             informacion = addForm.cleaned_data
+            idLaudus=crearProducto(informacion['code'],informacion['resume'],informacion['priceUnit'])
             producto = Inventory(
                     nameProduct=informacion['name'],
                     priceUnit = informacion['priceUnit'],
                     code = informacion['code'],
                     resume = informacion['resume'],
                     idWarehouse = informacion['idWarehouse'],
+                    idLaudus=idLaudus
                     )
             producto.save()
             messages.success(request,"Producto Añadido Correctamente")
@@ -51,6 +53,8 @@ def addProduct(request):
 
 
 def deleteProduct(request,pk):
+    producto = Inventory.objects.get(pk = pk)
+    eliminarProducto(producto.idLaudus)
     inventory=get_object_or_404(Inventory,pk=pk)
     inventory.delete()
     messages.success(request,"Producto Eliminado Correctamente")
@@ -102,6 +106,12 @@ def adInventario(request):
         addForm=addInventario(request.POST)
         if addForm.is_valid():
             informacion = addForm.cleaned_data
+            producto = Inventory.objects.get(pk = informacion['producto'])
+            if informacion['type']=='1':
+                warehouseID=warehouse.objects.get(pk=producto.idWarehouse.pk)
+                ingresoBodega(warehouseID.idLaudus,producto.idLaudus,informacion['cantidad'])
+            else:
+                pass
             inventario = Stock(
                     product=informacion['producto'],
                     quantity=informacion['cantidad'],
@@ -122,8 +132,10 @@ def addBodega(request):
         addForm=añadirBodega(request.POST)
         if addForm.is_valid():
             informacion = addForm.cleaned_data
+            idLaudus=crearBodega(informacion['name'])
             bodega = warehouse(
                     nameWarehouse=informacion['name'],
+                    idLaudus=idLaudus
                     )
             bodega.save()
             messages.success(request,"Bodega Añadida Correctamente")

@@ -101,7 +101,7 @@ class addInventario(ModelForm):
     )
     type = forms.ChoiceField(choices=[('1','Entrada'),('2','Salida')])
     pro=forms.CharField(label="Pro",
-        widget=forms.TextInput(attrs={'class': 'form-control'}),required=False)
+        widget=forms.TextInput(attrs={'class': 'form-control'}),required=False,help_text="Solo para registro presencial, de lo contrario dejar vacio")
     
     class Meta:
         model = Stock
