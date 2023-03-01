@@ -10,6 +10,12 @@ urlpatterns = [
     path("bodegas/",bodegaList,name="bodegas"),
     path("addBodega/",addBodega,name="addBodega"),
     path("deleteBodega/<pk>",deleteBodega,name="deleteBodega"),
+    path("inventario/",inventarioList,name="inventario"),
+    path("addInventario/",adInventario,name="addInventario"),
+    path("inventory/<pk>",inventarioHistoria,name="historia"),
+    
+    
+    
     
     
     path("dashboard",dashboard,name="dashboard"),

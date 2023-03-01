@@ -20,7 +20,23 @@ class Inventory(models.Model):
     
     def __str__(self) -> str:
         return self.code
+
+    def count_inventory(self):
+        stocks = Stock.objects.filter(product = self)
+        stockIn = 0
+        stockOut = 0
+        for stock in stocks:
+            if stock.type == '1':
+                stockIn = int(stockIn) + int(stock.quantity)
+            else:
+                stockOut = int(stockOut) + int(stock.quantity)
+        available  = stockIn - stockOut
+        print(stockIn,stockOut)
+        return available
     
-class Inventario(models.Model):
-    code = models.ForeignKey(Inventory,blank=True,null=False,on_delete=models.CASCADE,default="")
-    stock=models.IntegerField(null=False,blank=False)
+class Stock(models.Model):
+    product = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    quantity = models.FloatField(default=0)
+    type = models.CharField(max_length=2,choices=(('1','Entrada'),('2','Salida')), default = 1)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True,blank=True,null=False)

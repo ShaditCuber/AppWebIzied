@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Inventory,warehouse
+from .models import Inventory,warehouse,Stock
 from django import forms
 
 
@@ -84,3 +84,23 @@ class añadirBodega(ModelForm):
         fields = ["name"]
         help_texts ={k:"" for k in fields}
         excluded="code"
+    
+    
+class addInventario(ModelForm):
+    producto = forms.ModelChoiceField(
+        queryset=Inventory.objects.all(),
+        required=True,
+        help_text="producto",
+        label="Producto",
+        to_field_name="code" # opcional si desea utilizar el campo 'id' como valor de la opción en lugar del objeto completo
+    )
+    
+    cantidad=forms.IntegerField(
+        label="Cantidad",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    type = forms.ChoiceField(choices=[('1','Entrada'),('2','Salida')])
+    class Meta:
+        model = Stock
+        fields = ["producto", "cantidad","type"]
+        help_texts ={k:"" for k in fields}

@@ -82,6 +82,41 @@ def bodegaList(request):
     return render(request,"Inventario/bodegaList.html",context=context)
     
 
+def inventarioList(request):
+    inventario=Inventory.objects.all()
+    context={"title":"Lista Inventario","inventario":inventario}
+    return render(request,"Inventario/inventarioList.html",context=context)
+
+
+def inventarioHistoria(request,pk):
+    context=dict()
+    product=get_object_or_404(Inventory,pk=pk)
+    stocks = Stock.objects.filter(product = product).all()
+    context['product'] = product
+    context['stocks'] = stocks
+
+    return render(request, 'Inventario/inventory-history.html', context )
+
+def adInventario(request):
+    if request.method=="POST":
+        addForm=addInventario(request.POST)
+        if addForm.is_valid():
+            informacion = addForm.cleaned_data
+            inventario = Stock(
+                    product=informacion['producto'],
+                    quantity=informacion['cantidad'],
+                    type=informacion['type'],
+                    
+                    
+                    )
+            inventario.save()
+            messages.success(request,"Inventario Añadida Correctamente")
+            return redirect('/inventario/')
+    else:
+        addForm=addInventario()
+        
+    return render(request,"Inventario/addInventario.html",{"form":addForm})
+
 def addBodega(request):
     if request.method=="POST":
         addForm=añadirBodega(request.POST)
@@ -108,7 +143,7 @@ def deleteBodega(request,pk):
 def dashboard(request):
     inventories=Inventory.objects.all()
     df= read_frame(inventories)
-    name_stock = df.groupby(by="name").sum().sort_values(by="stock")
+    name_stock = df.groupby(by="nameProduct").sum().sort_values(by="stock")
     nameStock = px.bar(name_stock, 
                                     x = name_stock.index, 
                                     y = name_stock.stock, 
