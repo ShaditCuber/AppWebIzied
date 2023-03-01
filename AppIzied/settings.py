@@ -87,13 +87,13 @@ WSGI_APPLICATION = 'AppIzied.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'iotd',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
+        'NAME': 'licitaciones',
+        'USER': 'IziedAdmin',
+        'PASSWORD': 'hueLlas.2022',
+        'HOST': 'licitacionesdb.cl8pkqghhsnx.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
         'OPTIONS': {
-            'options': '-c search_path=a' # nombre del esquema que desea utilizar
+            'options': '-c search_path=django' # nombre del esquema que desea utilizar
         }
     }
 }
