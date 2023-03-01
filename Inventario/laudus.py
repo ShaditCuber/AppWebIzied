@@ -30,8 +30,11 @@ def crearProducto(sku:str,description:str,unitPrice:int):
     }}""".format(sku, description, sku, unitPrice)
     data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
     time.sleep(5)
-    idProducto=data['productId']
-    return idProducto
+    try:
+        idProducto=data['productId']
+        return idProducto
+    except:
+        return None
     
 
     
@@ -88,4 +91,3 @@ def ingresoBodega(idWarehouse:str,idProduct:int,quantity:int):
     data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
     print(data)
     
-ingresoBodega('00J',692,1)

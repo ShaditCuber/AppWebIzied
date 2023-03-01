@@ -35,17 +35,21 @@ def addProduct(request):
         if addForm.is_valid():
             informacion = addForm.cleaned_data
             idLaudus=crearProducto(informacion['code'],informacion['resume'],informacion['priceUnit'])
-            producto = Inventory(
-                    nameProduct=informacion['name'],
-                    priceUnit = informacion['priceUnit'],
-                    code = informacion['code'],
-                    resume = informacion['resume'],
-                    idWarehouse = informacion['idWarehouse'],
-                    idLaudus=idLaudus
-                    )
-            producto.save()
-            messages.success(request,"Producto Añadido Correctamente")
-            return redirect('/productos/')
+            if idLaudus:
+                producto = Inventory(
+                        nameProduct=informacion['name'],
+                        priceUnit = informacion['priceUnit'],
+                        code = informacion['code'],
+                        resume = informacion['resume'],
+                        idWarehouse = informacion['idWarehouse'],
+                        idLaudus=idLaudus
+                        )
+                producto.save()
+                messages.success(request,"Producto Añadido Correctamente")
+                return redirect('/productos/')
+            else:
+                messages.success(request,"Producto Ya Existe")
+                return redirect('/productos/')
     else:
         addForm=añadir()
         
