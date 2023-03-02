@@ -72,7 +72,7 @@ def updateProduct(request,pk):
     if request.method=="POST":
         updateForm=actualizar(data=request.POST)
         if updateForm.is_valid():
-            inventory.nameProduct=updateForm.data['nameProduct']
+            inventory.code=updateForm.data['code']
             inventory.priceUnit=updateForm.data['priceUnit']
             inventory.resume=updateForm.data['resume']
             inventory.save()

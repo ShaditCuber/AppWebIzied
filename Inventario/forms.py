@@ -36,8 +36,8 @@ class añadir(forms.Form):
         
 class actualizar(ModelForm):
     
-    nameProduct = forms.CharField(
-        label="Nombre",
+    code = forms.CharField(
+        label="Code",
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     
@@ -63,7 +63,7 @@ class actualizar(ModelForm):
 
     class Meta:
         model = Inventory
-        fields = ["nameProduct", "priceUnit","resume","idWarehouse"]
+        fields = ["code", "priceUnit","resume","idWarehouse"]
         help_texts ={k:"" for k in fields}
         
         
