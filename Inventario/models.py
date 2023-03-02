@@ -11,7 +11,7 @@ class warehouse(models.Model):
 class Inventory(models.Model):
     
     code=models.CharField(max_length=100,null=False,blank=False,primary_key=True)
-    nameProduct = models.CharField(max_length=100,null=False,blank=False)
+    # nameProduct = models.CharField(max_length=100,null=False,blank=False)
     priceUnit=models.IntegerField(null=False,blank=False)
     resume=models.CharField(max_length=500,null=False,blank=False)
     creationDate=models.DateField(auto_now_add=True)

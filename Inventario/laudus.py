@@ -41,9 +41,10 @@ def crearProducto(sku:str,description:str,unitPrice:int):
 
 def eliminarProducto(idLaudus):
     funcion='production/products/'+str(idLaudus)
-    requests.delete(URL+funcion,headers=HEADERS).text
+    data=requests.delete(URL+funcion,headers=HEADERS).text
+    return 'error' in data
     
-    
+   
 
 def crearBodega(nombre:str):
     funcion='production/warehouses'
@@ -70,15 +71,15 @@ def crearBodega(nombre:str):
 def ingresoBodega(idWarehouse:str,idProduct:int,quantity:int):
     
     now = datetime.datetime.utcnow()
-
     iso_date = now.isoformat() + 'Z'
-    print(iso_date)
     funcion='production/inputs'
     payload="""{{
+        "date": '{}',
         "warehouse": {{
             "warehouseId": '{}',
         }},
-        "createdAt":{},
+        "createdAt":'{}',
+        "modifiedAt": '{}',
         "items": [
                 {{
                 "product": {{
@@ -87,7 +88,30 @@ def ingresoBodega(idWarehouse:str,idProduct:int,quantity:int):
                 "quantity": {},
                 }}
                 ]
-    }}""".format(str(idWarehouse),iso_date,idProduct,quantity)
+    }}""".format(str(iso_date),str(idWarehouse),str(iso_date),str(iso_date),idProduct,quantity)
     data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
     print(data)
+
+def salidaBodega(idWarehouse:str,idProduct:int,quantity:int):
     
+    now = datetime.datetime.utcnow()
+    iso_date = now.isoformat() + 'Z'
+    funcion='production/outputs'
+    payload="""{{
+        "date": '{}',
+        "warehouse": {{
+            "warehouseId": '{}',
+        }},
+        "createdAt":'{}',
+        "modifiedAt": '{}',
+        "items": [
+                {{
+                "product": {{
+                    "productId": {},
+                }},
+                "quantity": {},
+                }}
+                ]
+    }}""".format(str(iso_date),str(idWarehouse),str(iso_date),str(iso_date),idProduct,quantity)
+    data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
+    print(data)

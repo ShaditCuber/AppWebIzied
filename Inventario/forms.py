@@ -9,12 +9,6 @@ class añadir(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 
-    name = forms.CharField(
-        label="Nombre",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    
-
     priceUnit = forms.IntegerField(
         label="Precio Unitario",
         widget=forms.TextInput(attrs={'class': 'form-control'})

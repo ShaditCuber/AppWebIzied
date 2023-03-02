@@ -13,6 +13,8 @@ urlpatterns = [
     path("inventario/",inventarioList,name="inventario"),
     path("addInventario/",adInventario,name="addInventario"),
     path("inventory/<pk>",inventarioHistoria,name="historia"),
+    path("informe_diplomas",informe_diplomas,name="informe_diplomas"),
+    
     
     
     

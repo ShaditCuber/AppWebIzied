@@ -37,7 +37,6 @@ def addProduct(request):
             idLaudus=crearProducto(informacion['code'],informacion['resume'],informacion['priceUnit'])
             if idLaudus:
                 producto = Inventory(
-                        nameProduct=informacion['name'],
                         priceUnit = informacion['priceUnit'],
                         code = informacion['code'],
                         resume = informacion['resume'],
@@ -58,11 +57,14 @@ def addProduct(request):
 
 def deleteProduct(request,pk):
     producto = Inventory.objects.get(pk = pk)
-    eliminarProducto(producto.idLaudus)
-    inventory=get_object_or_404(Inventory,pk=pk)
-    inventory.delete()
-    messages.success(request,"Producto Eliminado Correctamente")
-    return redirect("/productos/")
+    if not eliminarProducto(producto.idLaudus):
+        inventory=get_object_or_404(Inventory,pk=pk)
+        inventory.delete()
+        messages.success(request,"Producto Eliminado Correctamente")
+        return redirect("/productos/")
+    else:
+        messages.success(request,"Producto Asociado a un Ingreso No se Puede eliminar")
+        return redirect("/productos/")
 
 def updateProduct(request,pk):
     inventory=get_object_or_404(Inventory,pk=pk)
@@ -111,18 +113,17 @@ def adInventario(request):
         if addForm.is_valid():
             informacion = addForm.cleaned_data
             producto = Inventory.objects.get(pk = informacion['producto'])
+            warehouseID=warehouse.objects.get(pk=producto.idWarehouse.pk)
             if informacion['type']=='1':
-                warehouseID=warehouse.objects.get(pk=producto.idWarehouse.pk)
                 ingresoBodega(warehouseID.idLaudus,producto.idLaudus,informacion['cantidad'])
             else:
-                pass
+                salidaBodega(warehouseID.idLaudus,producto.idLaudus,informacion['cantidad'])
             inventario = Stock(
                     product=informacion['producto'],
                     quantity=informacion['cantidad'],
                     type=informacion['type'],
                     pro=informacion['pro'],
                     )
-            
             inventario.save()
             messages.success(request,"Inventario Añadida Correctamente")
             return redirect('/inventario/')
@@ -177,3 +178,8 @@ def dashboard(request):
     most_product_in_stock = json.dumps(most_product_in_stock, cls=plotly.utils.PlotlyJSONEncoder)
     context={"nameStock":nameStock,"most_product_in_stock":most_product_in_stock}
     return render(request,"Inventario/dashboard.html", context=context)
+
+
+
+def informe_diplomas(request):
+    return render(request,"Inventario/index.html")
