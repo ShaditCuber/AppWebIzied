@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,include
 from .views import *
 urlpatterns = [
     path("",index,name="index"),
@@ -13,7 +13,7 @@ urlpatterns = [
     path("inventario/",inventarioList,name="inventario"),
     path("addInventario/",adInventario,name="addInventario"),
     path("inventory/<pk>",inventarioHistoria,name="historia"),
-    path("informe_diplomas",informe_diplomas,name="informe_diplomas"),
+    path("informe_diplomas/",include("Diplomas.urls"),name='informe_diplomas'),
     
     
     

@@ -19,4 +19,5 @@ from Inventario.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("Inventario.urls")),
+    
 ]

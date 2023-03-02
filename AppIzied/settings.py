@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*','127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'Diplomas',
     'widget_tweaks',
     'django_filters',
     'crispy_bootstrap5',

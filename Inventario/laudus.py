@@ -8,6 +8,7 @@ HEADERS = {
 }
 URL='https://api.laudus.cl/'
 def crearProducto(sku:str,description:str,unitPrice:int):
+    
     funcion='production/products'
     payload = """{{
     "sku": "{}",
@@ -29,6 +30,7 @@ def crearProducto(sku:str,description:str,unitPrice:int):
         }}
     }}""".format(sku, description, sku, unitPrice)
     data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
+    print(data)
     time.sleep(5)
     try:
         idProducto=data['productId']
@@ -44,7 +46,9 @@ def eliminarProducto(idLaudus):
     data=requests.delete(URL+funcion,headers=HEADERS).text
     return 'error' in data
     
-   
+
+def actualizarProducto():
+    pass
 
 def crearBodega(nombre:str):
     funcion='production/warehouses'
@@ -115,3 +119,5 @@ def salidaBodega(idWarehouse:str,idProduct:int,quantity:int):
     }}""".format(str(iso_date),str(idWarehouse),str(iso_date),str(iso_date),idProduct,quantity)
     data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
     print(data)
+    
+    

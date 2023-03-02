@@ -1,0 +1,16 @@
+{% extends '../layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-section">
+    <img src="{% static 'assets/image/fondo.png' %}" alt="" style="width: 100%;;">
+    <br>
+    <h2 style="text-align: center;">Diplomas</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Cargar archivo</button>
+    </form>
+</div>
+
+{% endblock %}
