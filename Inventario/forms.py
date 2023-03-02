@@ -38,7 +38,10 @@ class actualizar(ModelForm):
     
     code = forms.CharField(
         label="Code",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        disabled=True,
+        required=False
+        
     )
     
 
