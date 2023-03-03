@@ -7,6 +7,15 @@ HEADERS = {
   'Content-Type': 'application/json'
 }
 URL='https://api.laudus.cl/'
+
+def limpiarString(string_1):
+    """Compara dos strings ignorando mayusculas, tildes y limpiandolas primero"""
+    replaces = {'á':'a','é':'e','í':'i','ó':'o','ú':'u', 'ñ':'n'}
+    string_1 = str(string_1).strip().lower().replace("  ","")
+    for key, value in replaces.items():
+        string_1 = string_1.replace(key, value)
+    return string_1 
+
 def crearProducto(sku:str,description:str,unitPrice:int):
     
     funcion='production/products'
@@ -28,7 +37,7 @@ def crearProducto(sku:str,description:str,unitPrice:int):
         "userId": "st",
         "name": "string"
         }}
-    }}""".format(sku, description, sku, unitPrice)
+    }}""".format(limpiarString(sku), limpiarString(description), limpiarString(sku), unitPrice)
     
     try:
         data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
