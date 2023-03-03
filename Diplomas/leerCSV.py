@@ -1,13 +1,12 @@
 import pandas as pd
-# from .diplomas_informes import *
 from monday import MondayClient
 from reportlab.pdfgen import canvas
 import os
-import PyPDF2
 import datetime
 from PyPDF2 import PdfMerger
-from django.contrib import messages
-
+import boto3
+BUCKET_KEY = 'informes-diplomas'
+s3_client = boto3.client('s3')
 KEY='eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjUyNzcwNCwidWlkIjoyNTE1MDE3NCwiaWFkIjoiMjAyMi0xMC0xN1QyMzowMzoxMy4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.p4MW-Jjxo8GGKLfJ_Fif5EpYscJahLg9BXeNtj1GSXI'
 mon=MondayClient(KEY)
 
@@ -65,7 +64,7 @@ def leer(ruta,codigo):
         tipoFecha=2
         
 
-        
+    
     os.makedirs(f'./tmp/{codigo}',exist_ok=True)
     df=pd.read_csv('./tmp/'+ruta)
     merger = PdfMerger()
@@ -108,14 +107,26 @@ def leer(ruta,codigo):
         fecha_formateada_inicio = fecha_obj.strftime('%d/%m/%Y')
         fecha_obj = datetime.datetime.strptime(fin, '%Y-%m-%d')
         fecha_formateada_fin = fecha_obj.strftime('%d/%m/%Y')
+        year=fecha_obj.strftime('%Y')
         if tipoFecha==1:
             fechaFinal=fecha_formateada_inicio+' y '+fecha_formateada_fin
+            x_fecha=1280
         else:
             fechaFinal=fecha_formateada_inicio+'       '+fecha_formateada_fin
-            
-        c.drawString(1280, 593, fechaFinal)
+            x_fecha=1250
+        
+        c.drawString(x_fecha, 593, fechaFinal)
         c.save()
+        s3_path = year + "/" + codigo + "/" + rut+".pdf"
+            
+        try:
+            s3_client.upload_file(result_pdf, BUCKET_KEY, s3_path)
+            print(s3_path)
+        except Exception as e:
+            print(e)
+            pass
         merger.append(result_pdf)
+        
         
     diplomas=f'./tmp/{codigo}/Diplomas.pdf'
     merger.write(diplomas)
@@ -124,6 +135,10 @@ def leer(ruta,codigo):
     mon.items.add_file_to_column(fila,'archivo2',diplomas)
     #Subir diplomas a s3
     rmtree('./tmp/')
+    
+    
+    
+    
     return 200
     
 

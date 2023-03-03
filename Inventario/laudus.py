@@ -29,10 +29,9 @@ def crearProducto(sku:str,description:str,unitPrice:int):
         "name": "string"
         }}
     }}""".format(sku, description, sku, unitPrice)
-    data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
-    print(data)
-    time.sleep(5)
+    
     try:
+        data=requests.post(URL+funcion,headers=HEADERS,data=payload).json()
         idProducto=data['productId']
         return idProducto
     except:
