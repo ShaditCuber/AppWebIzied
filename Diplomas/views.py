@@ -14,8 +14,9 @@ def index(request):
             except:
                 pass
             archivo = request.FILES['archivo']
-            leer(archivo.name)
-            return redirect('informe_diplomas')
+            codigo=request.POST['codigoPro']
+            if leer(archivo.name,codigo):
+                return redirect('informe_diplomas')
     else:
         form = ArchivoForm()
     return render(request, 'Diplomas/index.html', {'form': form})

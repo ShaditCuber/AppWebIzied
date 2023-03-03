@@ -19,7 +19,7 @@ DIPLOMA_FILE_COLUMN_NAME = "Diplomas"
 
 TOKEN = '339aa39958e934fe16e3f21464b7b96a'
 TOKEN_CERT = 'adaba7cfeb8a2fdb4c20373601296357'
-monday_api_key = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjEyNDg5ODAxNSwidWlkIjoxNjAyMDMwOSwiaWFkIjoiMjAyMS0wOS0xNlQxMjozNjozNC4wNjRaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.9VlpAGh1gRSgumy3xI26lOLqwKdCGVqRNqdgDPLdVec"
+monday_api_key = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjUyNzcwNCwidWlkIjoyNTE1MDE3NCwiaWFkIjoiMjAyMi0xMC0xN1QyMzowMzoxMy4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.p4MW-Jjxo8GGKLfJ_Fif5EpYscJahLg9BXeNtj1GSXI"
 
 
 FUNCTION_GET_GRADE_ITEMS = 'gradereport_user_get_grade_items'
@@ -143,44 +143,7 @@ def add_file_to_column(item_id: str, filename: str = '/example.pdf', file_column
 
 
 
-def lambda_handler(event, context):
-    if (challenge:= syncchallenge(event)):
-        return{
-          "isBase64Encoded": False,
-          "statusCode": 200,
-          "body": json.dumps(challenge),
-          "headers": {
-            "content-type": "application/json"
-          }
-        }
-
-    try:
-        incoming_event = json.loads(event["body"])["event"]
-    except Exception as e:
-        return{
-          "isBase64Encoded": False,
-          "statusCode": 422,
-          "body": "BAD CALL",
-          "headers": {
-            "content-type": "application/json"
-          }
-        }
-    
-    print(event)
-
-    item = get_item_by_id(element_id= incoming_event['pulseId'])
-
-    
-    dips_column_id = next((col["id"] for col in item["column_values"] if lcomp(col["title"], DIPLOMA_FILE_COLUMN_NAME)), None)
-    if not dips_column_id:
-        exit("No se encontro la columna 'Diplomas' para subir el compilado")
-
-    dips_file = next((col["text"] for col in item["column_values"] if lcomp(col["title"], DIPLOMA_FILE_COLUMN_NAME)), "")
-    if ".pdf" in dips_file:
-        exit("Columna ya tiene un pdf, borrelo e intente de nuevo")
-
-    #courseid = 554
-    courseid = next((col["text"] for col in item["column_values"] if lcomp(col["title"], "URL Curso")), "").split("=")[-1]
+def lambda_handler(courseid,fila):
 
     course = call(fname = FUNCTION_GET_COURSE_BY_FIELD, KEY = TOKEN, field = 'id', value = courseid).json()["courses"][0]
     enroled_users = (call(fname = FUNCTION_GET_ENROLLED_USERS, KEY = TOKEN,  courseid = courseid).json())
@@ -259,15 +222,17 @@ def lambda_handler(event, context):
         merger.write(lc_path)
         merger.close()
 
+        
         try:
             s3_client.upload_file(lc_path, BUCKET_KEY, s3_path)
             print(s3_path)
         except Exception as e:
             print(e)
             pass
-
+        
         try:
-            reponse = add_file_to_column(item_id= incoming_event['pulseId'], filename= lc_path, file_column_id= dips_column_id)
+            reponse = add_file_to_column(item_id= fila, filename= lc_path, file_column_id= 'archivo2')
+            return True
         except Exception as e:
             print(reponse)
             print(e)
