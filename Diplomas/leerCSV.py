@@ -9,6 +9,9 @@ from fpdf import FPDF
 import math
 import time
 from PIL import ImageGrab, Image
+import plotly.graph_objs as go
+from plotly.graph_objs import Layout
+import numpy as np
 BUCKET_KEY = 'informes-diplomas'
 s3_client = boto3.client('s3')
 KEY='eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjUyNzcwNCwidWlkIjoyNTE1MDE3NCwiaWFkIjoiMjAyMi0xMC0xN1QyMzowMzoxMy4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.p4MW-Jjxo8GGKLfJ_Fif5EpYscJahLg9BXeNtj1GSXI'
@@ -95,14 +98,14 @@ def leer(ruta,codigo):
 
     
     os.makedirs(f'./tmp/{codigo}',exist_ok=True)
-    df=pd.read_csv('./tmp/'+ruta)
-    df = df.apply(lambda x: x.str.title() if x.dtype == "object" else x)
+    dfOriginal=pd.read_csv('./tmp/'+ruta)
+    dfOriginal = dfOriginal.apply(lambda x: x.str.title() if x.dtype == "object" else x)
         
     merger = PdfMerger()
     #fecha y horas modificar
     
     
-    for elemento,row in df.iterrows():
+    for elemento,row in dfOriginal.iterrows():
         nombres=row['nombres']
         rut=str(row['rut']).replace('.0','')
         nota=str(row['notas'])
@@ -167,35 +170,61 @@ def leer(ruta,codigo):
     merger.close()     
     # mon.items.add_file_to_column(fila,'archivo2',diplomas)
     
-    df = df.drop('rut', axis=1)
+    dfSinRut = dfOriginal.drop('rut', axis=1)
     # import dataframe_image as dfi
     # dfi.export(df, "df.png", dpi = 600)
-    import plotly.graph_objs as go
-    from plotly.graph_objs import Layout
-    import numpy as np
-    df.columns = ['Nombres', 'Nota']
-    cantidad=len(df. index)
-    if cantidad>13:
-        partes=cantidad/12
-        df_parts = np.array_split(df, int(partes))
-        # Crear figuras para cada una de las partes del dataframe
-        figs = []
-        for i, part in enumerate(df_parts):
-            notas_grouped = part.groupby('Nota').agg({'Nota': 'count'})
-            notas_grouped.columns = ['Cantidad Alumnos']
-            notas_grouped['Porcentaje'] = notas_grouped['Cantidad Alumnos'] / notas_grouped['Cantidad Alumnos'].sum() * 100
-            notas_grouped['Porcentaje'] = notas_grouped['Porcentaje'].apply(lambda x: f"{int(x)}%")
 
-            notas_grouped.index.name = 'Nota'
-            notas_grouped.reset_index(inplace=True)
-            total_alumnos = part['Nota'].count()
-            notas_grouped.loc[len(notas_grouped)] = ['Total', total_alumnos, "100%"]
-            fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(part))]  # Color de fondo para filas pares e impares
-            layout = Layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
-            )
-            fig = go.Figure(data=[
+    dfSinRut.columns = ['Nombres', 'Nota']
+    cantidad=len(dfOriginal. index)
+    partes=cantidad/12
+    df_parts = np.array_split(dfSinRut, int(partes))
+    # Crear figuras para cada una de las partes del dataframe
+    figs = []
+    #Creamos las tablas de Nombre - Nota
+    for i, part in enumerate(df_parts):
+        
+        fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(part))]  # Color de fondo para filas pares e impares
+        layout = Layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+        )
+        fig = go.Figure(data=[
+                            go.Table(
+                                header=dict(values=list(part.columns),align='center',fill_color='#6ec63b',font=dict(color='white')),
+                                cells=dict(values=part.values.transpose(),
+                                        fill_color=[fill_colors],
+                                        align='center'
+                                        )
+                                    )
+                            ],layout=layout)
+
+        fig.write_image(f'./tmp/tabla_notas-{i}.png',scale=6)
+        figs.append(f'./tmp/tabla_notas-{i}.png')
+     
+     
+    
+    
+    
+    counts=dfSinRut['Nota'].value_counts()
+    # Calculamos los porcentajes de cada nota
+    percentages = counts / counts.sum() * 100
+    # Creamos la tabla
+    table = pd.concat([counts, percentages], axis=1)
+    table.columns = ['Cantidad Alumnos', 'Porcentaje']
+    table.index.name = 'Nota'
+    table.reset_index(inplace=True)
+    total_alumnos = counts.sum()
+    table['Porcentaje'] = table['Porcentaje'].round(2).apply(lambda x: f"{x}%")
+    cantidadPorcentaje=len(table. index)
+    partesP=cantidadPorcentaje/12
+    dfPartsPorcentaje = np.array_split(table, int(partesP))
+    for i, part in enumerate(dfPartsPorcentaje):
+        fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(table))]  # Color de fondo para filas pares e impares
+        
+        if i == len(dfPartsPorcentaje) - 1:
+            part.loc[len(part)] = ['Total', total_alumnos, '100%']
+            fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
+        fig = go.Figure(data=[
                                 go.Table(
                                     header=dict(values=list(part.columns),align='center',fill_color='#6ec63b',font=dict(color='white')),
                                     cells=dict(values=part.values.transpose(),
@@ -204,34 +233,112 @@ def leer(ruta,codigo):
                                             )
                                         )
                                 ],layout=layout)
+        
+        fig.write_image(f'./tmp/tabla_notas_porcentaje-{i}.png',scale=6)
+        figs.append(f'./tmp/tabla_notas_porcentaje-{i}.png')
+    
+    # for i, part in enumerate(df_parts):
+    #     notas_grouped = part.groupby('Nota').agg({'Nota': 'count'})
+    #     print(notas_grouped)
+    #     exit()
+    #     notas_grouped.columns = ['Cantidad Alumnos']
+    #     notas_grouped['Porcentaje'] = notas_grouped['Cantidad Alumnos'] / notas_grouped['Cantidad Alumnos'].sum() * 100
+    #     notas_grouped['Porcentaje'] = notas_grouped['Porcentaje'].apply(lambda x: f"{int(x)}%")
 
-            fig.write_image(f'./tmp/tabla_notas-{i}.png',scale=6)
-            figs.append(f'./tmp/tabla_notas-{i}.png')
+    #     notas_grouped.index.name = 'Nota'
+    #     notas_grouped.reset_index(inplace=True)
+    #     total_alumnos = part['Nota'].count()
+    #     fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(notas_grouped))]  # Color de fondo para filas pares e impares
+        
+    #     if i == len(df_parts) - 1:
+    #         # Add "Total" row to notas_agrupadas
+    #         notas_grouped.loc[len(notas_grouped)] = ['Total', total_alumnos, '100%']
+    #         fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
+        
+    #     fig = go.Figure(data=[
+    #                         go.Table(
+    #                             header=dict(values=list(notas_grouped.columns),align='center',fill_color='#6ec63b',font=dict(color='white')),
+    #                             cells=dict(values=notas_grouped.values.transpose(),
+    #                                     fill_color=[fill_colors],
+    #                                     align='center'
+    #                                     )
+    #                                 )
+    #                         ],layout=layout)
+    #     fig.write_image(f'./tmp/tabla_notas_porcentaje-{i}.png',scale=6)
+    #     figs.append(f'./tmp/tabla_notas_porcentaje-{i}.png')
+    # Definir los límites de los intervalos
     
-    fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(notas_grouped))]  # Color de fondo para filas pares e impares
-    fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
-    fig = go.Figure(data=[
-                        go.Table(
-                            header=dict(values=list(notas_grouped.columns),align='center',fill_color='#6ec63b',font=dict(color='white')),
-                            cells=dict(values=notas_grouped.values.transpose(),
-                                    fill_color=[fill_colors],
-                                    align='center'
-                                    )
-                                )
-                        ],layout=layout)
-    fig.write_image('./tmp/tabla_notas_porcentaje.png',scale=6)
+    # bins=[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7]
+    # dfTablaNotas==
+    # # Crear una nueva columna en el dataframe con los intervalos correspondientes a cada nota
+    # dfSinRut['rango_notas'] = pd.cut(float(dfSinRut['Nota']), bins=bins)
+    # print(dfSinRut)
+    # # Agrupar el dataframe por los intervalos y contar la cantidad de alumnos en cada intervalo
+    # tabla_notas = part.groupby('rango_notas')['Nota'].agg(['count']).reset_index()
+    # print(tabla_notas)
+    # exit()
+    # # Renombrar las columnas
+    # tabla_notas.columns = ['Rango de Notas', 'Cantidad Alumnos']
+
+    # # Mostrar la tabla resultante
+    # print(tabla_notas)
     
-    fig = go.Figure(go.Bar(
-            x=notas_grouped['Nota'],
-            y=notas_grouped['Cantidad Alumnos'],
-            width=0.4,
-            text=notas_grouped['Cantidad Alumnos'], # agregar texto encima de cada barra
-            textposition='outside', # posición del texto
-            marker_color='#6ec63b',
-            textfont=dict(color='black')
-        ),layout=layout)
-    fig.update_layout(title='Cantidad de alumnos por nota',title_x=.5)
-    fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
+    # exit()
+    dfBarras=table
+    
+    if cantidad>60:
+        # bins = [x/2 for x in range(2, 15)]
+        # labels = [f'{x-.5} - {x}' for x in bins]
+        dfBarras = dfBarras.drop('Porcentaje', axis=1)
+        dfBarras=dfBarras.iloc[:-1]
+        # notas_grouped['rango_notas'] = pd.cut(notas_grouped['Nota'], bins=range(0, 110, 10))
+        # df_grouped = notas_grouped.groupby('rango_notas')['Cantidad Alumnos'].sum().reset_index()
+        # fig=go.Figure(go.Bar(x=df_grouped['rango_notas'], y=df_grouped['Cantidad Alumnos']),layout=layout)
+        # print(fig)
+        # fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
+        dfBarras['rango_notas'] = pd.cut(dfBarras['Nota'], bins=[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7])
+        dfBarras = dfBarras.groupby('rango_notas')['Cantidad Alumnos'].sum().reset_index()
+        dfBarras['rango_notas_str'] = dfBarras['rango_notas'].astype(str)
+        dfBarras['rango_notas_display'] = dfBarras['rango_notas'].apply(lambda x: f'{x.left}-{x.right}')
+        fig = go.Figure([go.Bar(x=dfBarras['rango_notas_display'], y=dfBarras['Cantidad Alumnos'])],layout=layout)
+        fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
+        figs.append('./tmp/tabla_notas_barras.png')
+        
+        # dfBarras['Nota']=dfBarras['Nota'].apply(lambda x: int(x))
+        # dfBarras['Nota Rango'] = pd.cut(dfBarras['Nota'], bins=bins, labels=labels)
+        # dfBarras['Nota Rango Num'] = dfBarras['Nota Rango'].apply(lambda x: (float(x.split('-')[0].strip()) + float(x.split('-')[1].strip())) / 2)
+
+        # dfBarras = dfBarras.groupby('Nota Rango Num').sum().reset_index()
+
+        # fig = go.Figure(go.Bar(
+        #     x=dfBarras['Nota Rango Num'],
+        #     y=dfBarras['Cantidad Alumnos'],
+        #     width=0.4,
+        #     text=dfBarras['Cantidad Alumnos'],
+        #     textposition='auto',
+        #     marker_color='#6ec63b',
+        #     textfont=dict(color='black')
+        # ),layout=layout)
+        # fig.update_layout(title='Cantidad de alumnos por nota',title_x=.5)
+        # fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
+    else:
+        dfBarras = dfBarras.groupby('Nota').agg({'Nota': 'count'})
+        dfBarras.columns = ['Cantidad Alumnos']
+        dfBarras.index.name = 'Nota'
+        dfBarras.reset_index(inplace=True)
+        dfBarras['Nota'] = dfBarras['Nota'].apply(lambda x: '{:.1f}'.format(x))
+        fig = go.Figure(go.Bar(
+                x=dfBarras['Nota'],
+                y=dfBarras['Cantidad Alumnos'],
+                width=0.1,
+                text=dfBarras['Cantidad Alumnos'], # agregar texto encima de cada barra
+                textposition='outside', # posición del texto
+                marker_color='#6ec63b',
+                textfont=dict(color='black')
+            ),layout=layout)
+        fig.update_layout(title='Cantidad de alumnos por nota',title_x=.5)
+        fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
+        figs.append('./tmp/tabla_notas_barras.png')
 
     base_dir='./static/assets'
     print("Generando Informe")
@@ -257,11 +364,10 @@ def leer(ruta,codigo):
     'October': 'octubre',
     'November': 'noviembre',
     'December': 'diciembre'
-}
+    }
 
     fecha_actual = now.strftime("%d %B %Y")
-    fecha_actual = fecha_actual.replace(fecha_actual.split()[1], "de "+meses[fecha_actual.split()[1]].title()+ " del ")
-    print(fecha_actual)
+    fecha_actual = fecha_actual.replace(fecha_actual.split()[1], "de "+meses[fecha_actual.split()[1]].title()+ " del")
     pdf1.set_font('openSansLight','',16)
     pdf1.set_xy(25,50)
     pdf1.multi_cell(160, 9,
@@ -310,20 +416,11 @@ def leer(ruta,codigo):
         fill = False)
 
 
-
-    # cuadros_notas = [f for f in listdir(download_folder) if isfile(join(download_folder, f)) and "nota" in f]
-
-    pixel_to_mm = 0.2645833333
-    normal_widht_change = 1.375
-    big_widht_change = 1.15
-    # df = df.drop('rut', axis=1)
-    # tablaNotas=df.to_html()    
     for tabla in figs:
         pdf1.add_page('P','A4')
         pdf1.image(base_dir + '\\base\\background.png', x = 0, y = 0, w = 210, h = 297)
-
         pdf1.set_font('leagueSpartan','',28)
-        pdf1.set_xy(10,42)
+        pdf1.set_xy(12,42)
         pdf1.multi_cell(190, 5,
             'Resultados de la Evaluación',
             border = 0,
@@ -331,147 +428,6 @@ def leer(ruta,codigo):
             fill = False)
         
         pdf1.image(tabla, x = 0, y = 0, w = 210, h = 297)
-    
-    
-    
-    # pdf1.set_font('Arial', 'B', 12)
-    
-    # pdf1.cell(40)
-    # col_width = pdf1.w / 6
-    # row_height = pdf1.font_size * 1.5
-    # for col in df.columns:
-    #     pdf1.cell(col_width, row_height, str(col).title(), border=1,align='C')
-    
-    # pdf1.ln(row_height)
-
-    # # Agregar filas de datos
-    # for row in df.values:
-    #     for item in row:
-    #         pdf1.cell(col_width, row_height, str(item), border=1,align='C')
-    #     pdf1.ln(row_height)
-        
-    # pdf1.set_xy(40, 20)
-
-    # # Agregar encabezado
-    # pdf1.set_font('Arial', 'B', 16)
-    # pdf1.cell(0, 10, 'Tabla de datos', ln=1, align='C')
-    # data = dataframe_to_lists(df)
-    # for row in data:
-    #     for item in row:
-    #         pdf1.multi_cell(190, 10, str(item))
-    #     pdf1.ln()
-    #     cn_img = Image.open(join(download_folder, cuadro_notas))
-    #     cn_size = cn_img.size
-    #     if max_len_name < 30:
-    #         pdf1.image(join(download_folder, cuadro_notas),
-    #             x = (210-cn_size[0]*pixel_to_mm*normal_widht_change)/2, 
-    #             y = (297-cn_size[1]*pixel_to_mm*1.375)/2 + 10, 
-    #             w = cn_size[0]*pixel_to_mm*normal_widht_change, 
-    #             h = cn_size[1]*pixel_to_mm*1.375, 
-    #             type = 'PNG', link = '')
-    #     else:
-    #         pdf1.image(join(download_folder, cuadro_notas),
-    #             x = (210-cn_size[0]*pixel_to_mm*big_widht_change)/2, 
-    #             y = (297-cn_size[1]*pixel_to_mm*1.375)/2 + 10, 
-    #             w = cn_size[0]*pixel_to_mm*big_widht_change, 
-    #             h = cn_size[1]*pixel_to_mm*1.375, 
-    #             type = 'PNG', link = '')
-
-    # cn_img = Image.open(join(download_folder, "agrupadas.png"))
-    # cn_size_gp = cn_img.size
-    # cn_img.close()
-    # cn_img = Image.open(join(download_folder, "graph.png"))
-    # cn_size_ch = cn_img.size
-    # cn_img.close()
-    # if not db_encuesta.empty:
-    #     cn_img = Image.open(join(download_folder, "encuesta.png"))
-    #     cn_size_en = cn_img.size
-    #     cn_img.close()
-
-
-    # pdf1.add_page(format = 'A4')
-    # pdf1.image(base_dir + '\\base\\background.png', x = 0, y = 0, w = 210, h = 297)
-    # pdf1.set_font('leagueSpartan','',28)
-    # pdf1.set_xy(40,42)
-    # pdf1.multi_cell(190, 5,
-    #     'Resultados de la Evaluación',
-    #     border = 0,
-    #     align = 'CB',
-    #     fill = False)
-    # #1.375 ratio
-
-    # if len(numbers) < 6 : # Caben bien en la pagina juntos     
-    #     pdf1.image(join(download_folder, "agrupadas.png"),
-    #             x = (210 - cn_size_gp[0]*pixel_to_mm*1.375)/2, 
-    #             y = (297 
-    #                 - cn_size_gp[1]*pixel_to_mm*1.375
-    #                 - cn_size_ch[1]*pixel_to_mm*0.75 
-    #                 - 20)/2 + 10, 
-    #             w = cn_size_gp[0]*pixel_to_mm*1.375, 
-    #             h = cn_size_gp[1]*pixel_to_mm*1.375, 
-    #             type = 'PNG', link = '')
-
-    #     pdf1.image(join(download_folder, "graph.png"), 
-    #             x = (210 - cn_size_ch[0]*pixel_to_mm*0.75)/2, 
-    #             y = (297 
-    #                 - cn_size_gp[1]*pixel_to_mm*1.375
-    #                 - cn_size_ch[1]*pixel_to_mm*0.75 
-    #                 - 20)/2 + 10 
-    #                 + cn_size_gp[1]*pixel_to_mm*1.375
-    #                 + 20, 
-    #             w = cn_size_ch[0]*pixel_to_mm*0.75, 
-    #             h = cn_size_ch[1]*pixel_to_mm*0.75, 
-    #             type = 'PNG', link = '')
-
-    # else:   # Necesitan 2 Paginas
-    #     pdf1.image(join(download_folder, "agrupadas.png"), 
-    #         x = (210 - (cn_size_gp[0]*pixel_to_mm))/2, 
-    #         y = (297 - (cn_size_gp[1]*pixel_to_mm))/2, 
-    #         w = cn_size_gp[0]*pixel_to_mm, 
-    #         h = cn_size_gp[1]*pixel_to_mm, 
-    #         type = 'PNG', link = '')
-
-    #     pdf1.add_page(format = 'A4')
-    #     pdf1.image(base_dir + '\\base\\background.png', x = 0, y = 0, w = 210, h = 297)
-    #     pdf1.set_font('leagueSpartan','',28)
-    #     pdf1.set_xy(40,42)
-    #     pdf1.multi_cell(190, 5,
-    #         'Resultados de la Evaluación',
-    #         border = 0,
-    #         align = 'CB',
-    #         fill = False)
-
-    #     """pdf1.image(join(download_folder, "graph.png"), 
-    #         x = (210 - (cn_size_ch[0]*pixel_to_mm*0.75))/2, 
-    #         y = (297 - (cn_size_ch[1]*pixel_to_mm*0.75))/2, 
-    #         w = cn_size_ch[0]*pixel_to_mm*0.75, 
-    #         h = cn_size_ch[1]*pixel_to_mm*0.75, 
-    #         type = 'PNG', link = '') """   
-    #     pdf1.image(join(download_folder, "graph.png"), 
-    #         x = 20, 
-    #         y = (297 - (cn_size_ch[1]*(170/cn_size_ch[0]))) /2, 
-    #         w = 170, 
-    #         h = (cn_size_ch[1]*(170/cn_size_ch[0])), 
-    #         type = 'PNG', link = '')
-
-
-    # if not db_encuesta.empty:
-    #     pdf1.add_page(format = 'A4')
-    #     pdf1.image(base_dir + '\\base\\background.png', x = 0, y = 0, w = 210, h = 297)
-    #     pdf1.set_font('leagueSpartan','',28)
-    #     pdf1.set_xy(40,42)
-    #     pdf1.multi_cell(190, 5,
-    #         'Resultados de la Encuesta',
-    #         border = 0,
-    #         align = 'CB',
-    #         fill = False)
-
-    #     pdf1.image(join(download_folder, "encuesta.png"), 
-    #             x = (210 - (cn_size_en[0]*pixel_to_mm))/2, 
-    #             y = (297 - (cn_size_en[1]*pixel_to_mm))/2, 
-    #             w = cn_size_en[0]*pixel_to_mm, 
-    #             h = cn_size_en[1]*pixel_to_mm, 
-    #             type = 'PNG', link = '')
 
     pdf1.output("./tmp/generado.pdf")
 
@@ -482,7 +438,7 @@ def leer(ruta,codigo):
     merger.append(base_dir+'/base/portada.pdf')
     merger.append("./tmp/generado.pdf")
     merger.append(base_dir+'/base/contraportada.pdf')
-    merger.write("./tmp/informe.pdf")
+    merger.write("./tmp/Informe.pdf")
     merger.close()
     # from shutil import rmtree
     # rmtree('./tmp/')
@@ -493,7 +449,7 @@ def leer(ruta,codigo):
 
 
 
-leer('ejemplo.csv','500000')
+leer('datos.csv','500000')
     
 
     
