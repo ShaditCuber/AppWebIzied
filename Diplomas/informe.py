@@ -1264,6 +1264,6 @@ def lambda_handler(fila, context):
 
         
 
-if __name__ == "__main__":
-    lambda_handler('3836689992', None)
+# if __name__ == "__main__":
+#     lambda_handler('3836689992', None)
     

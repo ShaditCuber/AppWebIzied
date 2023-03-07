@@ -2,6 +2,8 @@
 {% block content %}
 <div class="content-section ">
     <a href="{% url 'add' %}" class="btn btn-success btn-xl mb-2">Añadir</a>
+    <a class="btn btn-danger btn-xl mb-2"
+        href="{% url 'previous_view' %}?prev={{ request.resolver_match.url_name }}">Volver</a>
     <h2>Filtro de Busqueda de Productos</h2>
     <div class="col">
         <div class="card-body">
@@ -17,12 +19,12 @@
             </form>
         </div>
     </div>
-    <table class="table table-striped table-bordered table-hoved table-dark table-responsive"
+    <table class="table table-striped table-bordered table-hoved table-dark table-responsive text-center"
         style="table-layout: fixed;">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">Code</th>
-                <th scope="col" class="d-none d-lg-table-cell">Precio</th>
+                <th scope="col" class="d-none d-lg-table-cell">Precio $</th>
                 <th scope="col" class="d-none d-lg-table-cell">Insercion</th>
                 <th scope="col" class="d-none d-lg-table-cell">Actualizacion</th>
                 <th scope="col">Actualizar</th>
@@ -37,7 +39,7 @@
             <tr style="cursor:pointer;cursor: hand;"
                 onclick="window.location=`{% url 'xProductView' inventory.code %}`">
                 <th scope="row">{{inventory.code}}</th>
-                <th scope="row" class="d-none d-lg-table-cell">{{inventory.priceUnit}}</th>
+                <th scope="row" class="d-none d-lg-table-cell">$ {{inventory.priceUnit}}</th>
                 <th scope="row" class="d-none d-lg-table-cell">{{inventory.creationDate | date:"d/m/Y"}}</th>
                 <th scope="row" class="d-none d-lg-table-cell">{{inventory.updateDate | date:"d/m/Y"}}</th>
                 <th scope="row"><a href="{% url 'actualizar' inventory.code %}"

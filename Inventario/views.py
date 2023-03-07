@@ -1,6 +1,7 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from django.contrib import messages
 from django_pandas.io import read_frame
+from django.urls import reverse
 from .models import Inventory
 from .forms import *
 from .filters import *
@@ -9,6 +10,16 @@ import plotly.express as px
 import json
 from .laudus import *
 # Create your views here.
+
+
+def previous_view(request):
+    previous_view_name = request.GET.get('prev', None)
+    if previous_view_name is not None:
+        previous_view_url = reverse(previous_view_name)
+        return redirect(previous_view_url)
+    else:
+        # Si no se proporciona una vista anterior, redirige a una página predeterminada
+        return redirect('home')
 
 def index(request):
     context={"title":"Inicio"}
@@ -93,7 +104,9 @@ def bodegaList(request):
 
 def inventarioList(request):
     inventario=Inventory.objects.all()
-    context={"title":"Lista Inventario","inventario":inventario}
+    filtro=BodegaFiltro(request.GET,queryset=inventario)
+    inventario=filtro.qs
+    context={"title":"Lista Inventario","inventario":inventario,"filtro":filtro}
     return render(request,"Inventario/inventarioList.html",context=context)
 
 
@@ -146,7 +159,7 @@ def addBodega(request):
             return redirect('/bodegas/')
     else:
         addForm=añadirBodega()
-        
+    
     return render(request,"Inventario/addBodega.html",{"form":addForm})
 
 

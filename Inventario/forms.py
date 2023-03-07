@@ -31,9 +31,7 @@ class añadir(forms.Form):
         model = Inventory
         fields = ["code", "name", "priceUnit","resume","idWarehouse"]
         help_texts ={k:"" for k in fields}
-        
-        
-        
+          
 class actualizar(ModelForm):
     
     code = forms.CharField(

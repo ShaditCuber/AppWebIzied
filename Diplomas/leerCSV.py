@@ -138,7 +138,7 @@ def leer(ruta,codigo):
         c.drawString(955, 550, nota)
         c.setFont('Helvetica',24)
         inicio=fecha.split(' - ')[0]
-        fin=fecha.split(' - ')[0]
+        fin=fecha.split(' - ')[1]
         fecha_obj = datetime.datetime.strptime(inicio, '%Y-%m-%d')
         fecha_formateada_inicio = fecha_obj.strftime('%d/%m/%Y')
         fecha_obj = datetime.datetime.strptime(fin, '%Y-%m-%d')
@@ -449,7 +449,7 @@ def leer(ruta,codigo):
 
 
 
-leer('datos.csv','500000')
+# leer('datos.csv','500000')
     
 
     

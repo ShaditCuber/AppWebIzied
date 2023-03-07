@@ -13,6 +13,10 @@ urlpatterns = [
     path("inventario/",inventarioList,name="inventario"),
     path("addInventario/",adInventario,name="addInventario"),
     path("inventory/<pk>",inventarioHistoria,name="historia"),
+    path("",previous_view,name="previous_view"),
+    
+    
+    
     path("informe_diplomas/",include("Diplomas.urls"),name='informe_diplomas'),
     
     

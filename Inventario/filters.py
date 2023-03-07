@@ -9,3 +9,11 @@ class OrderFilter(django_filters.FilterSet):
         model=Inventory
         fields=["code"]
         exclude=["creationDate","updateDate"]
+
+
+class BodegaFiltro(django_filters.FilterSet):
+    idWarehouse = django_filters.ModelChoiceFilter(queryset=warehouse.objects.all(),label='Bodega',initial=warehouse.objects.all().first(),empty_label=None)
+    
+    class Meta:
+        model=Inventory
+        fields=["idWarehouse"]

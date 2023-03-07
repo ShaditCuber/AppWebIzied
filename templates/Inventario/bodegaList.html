@@ -3,8 +3,10 @@
 <div class="content-section ">
     <!-- modificar para bodegas -->
     <a href="{% url 'addBodega' %}" class="btn btn-success btn-sm mb-2">Añadir</a>
+    <a class="btn btn-danger btn-sm mb-2"
+        href="{% url 'previous_view' %}?prev={{ request.resolver_match.url_name }}">Volver</a>
 
-    <table class="table table-striped table-bordered table-hoved table-dark table-responsive"
+    <table class="table table-striped table-bordered table-hoved table-dark table-responsive text-center"
         style="table-layout: fixed;">
         <thead class="thead-dark">
             <tr>
