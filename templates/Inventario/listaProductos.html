@@ -1,10 +1,21 @@
 {% extends '../layout.html' %}
 {% block content %}
 <div class="content-section ">
+
+    <!-- <h2>Filtro de Busqueda de Productos</h2>
     <a href="{% url 'add' %}" class="btn btn-success btn-xl mb-2">Añadir</a>
     <a class="btn btn-danger btn-xl mb-2"
-        href="{% url 'previous_view' %}?prev={{ request.resolver_match.url_name }}">Volver</a>
-    <h2>Filtro de Busqueda de Productos</h2>
+        href="{% url 'previous_view' %}?prev={{ request.resolver_match.url_name }}">Volver</a> -->
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Productos</h2>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="{% url 'add' %}" class="btn btn-success btn-xl mb-2 ">Añadir</a>
+            <a class="btn btn-danger btn-xl mb-2"
+                href="{% url 'previous_view' %}?prev={{ request.resolver_match.url_name }}">Volver</a>
+        </div>
+    </div>
     <div class="col">
         <div class="card-body">
             <form method="get">

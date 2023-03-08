@@ -80,6 +80,18 @@ def crearBodega(nombre:str):
     
 
 
+def actualizarBodega(idBodega,nombre):
+    funcion='production/warehouses/{}'.format(idBodega)
+    payload="""{{
+    "warehouseId": "{}",
+    "name": "{}",
+    "address": "Calle 2 Norte 376,Condominio Costa San Pedro",
+    "city": "San Pedro de la Paz",
+    "county": "Concepcion",
+    }}""".format(idBodega,nombre)
+    data=requests.put(URL+funcion,headers=HEADERS,data=payload).json()
+    return data['warehouseId']!=None
+
 def ingresoBodega(idWarehouse:str,idProduct:int,quantity:int):
     
     now = datetime.datetime.utcnow()
@@ -129,3 +141,4 @@ def salidaBodega(idWarehouse:str,idProduct:int,quantity:int):
     print(data)
     
     
+

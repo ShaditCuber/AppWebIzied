@@ -79,7 +79,17 @@ class añadirBodega(ModelForm):
         fields = ["name"]
         help_texts ={k:"" for k in fields}
         excluded="code"
-    
+
+class updateBodega(ModelForm):
+    nameWarehouse = forms.CharField(
+        label="Nombre Bodega",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = warehouse
+        fields = ["nameWarehouse"]
+        help_texts ={k:"" for k in fields}
     
 class addInventario(ModelForm):
     producto = forms.ModelChoiceField(

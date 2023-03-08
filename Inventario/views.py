@@ -79,7 +79,6 @@ def deleteProduct(request,pk):
 
 def updateProduct(request,pk):
     inventory=get_object_or_404(Inventory,pk=pk)
-    print(inventory)
     if request.method=="POST":
         updateForm=actualizar(data=request.POST)
         if updateForm.is_valid():
@@ -106,7 +105,9 @@ def inventarioList(request):
     inventario=Inventory.objects.all()
     filtro=BodegaFiltro(request.GET,queryset=inventario)
     inventario=filtro.qs
-    context={"title":"Lista Inventario","inventario":inventario,"filtro":filtro}
+    filtroPro=OrderFilter(request.GET,queryset=inventario)
+    inventario=filtroPro.qs
+    context={"title":"Lista Inventario","inventario":inventario,"filtro":filtro,"filtroPro":filtroPro}
     return render(request,"Inventario/inventarioList.html",context=context)
 
 
@@ -119,7 +120,8 @@ def inventarioHistoria(request,pk):
 
     return render(request, 'Inventario/inventory-history.html', context )
 
-def adInventario(request):
+def adInventario(request,pk=""):
+    product=get_object_or_404(Inventory,pk=pk)
     if request.method=="POST":
         addForm=addInventario(request.POST)
         if addForm.is_valid():
@@ -140,7 +142,7 @@ def adInventario(request):
             messages.success(request,"Inventario Añadida Correctamente")
             return redirect('/inventario/')
     else:
-        addForm=addInventario()
+        addForm=addInventario(initial={'producto': product})
         
     return render(request,"Inventario/addInventario.html",{"form":addForm})
 
@@ -162,6 +164,22 @@ def addBodega(request):
     
     return render(request,"Inventario/addBodega.html",{"form":addForm})
 
+
+def modBodega(request,pk):
+    bod=get_object_or_404(warehouse,pk=pk)
+    if request.method=="POST":
+        updateForm=updateBodega(data=request.POST)
+        
+        if updateForm.is_valid():
+            if actualizarBodega(bod.idLaudus,updateForm.data['name']):
+                bod.nameWarehouse=updateForm.data['name']
+                bod.save()
+                messages.success(request,"Bodega Actualizada Correctamente")
+                return redirect(f'/bodegas/')
+    else:
+        updateForm=updateBodega(instance=bod)
+    
+    return render(request,"Inventario/updateBodega.html",{"form":updateForm})
 
 def deleteBodega(request,pk):
     warehous=get_object_or_404(warehouse,pk=pk)

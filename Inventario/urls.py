@@ -10,8 +10,11 @@ urlpatterns = [
     path("bodegas/",bodegaList,name="bodegas"),
     path("addBodega/",addBodega,name="addBodega"),
     path("deleteBodega/<pk>",deleteBodega,name="deleteBodega"),
+    path("actualizarBodega/<pk>",modBodega,name="modBodega"),
     path("inventario/",inventarioList,name="inventario"),
+    path("addInventario/<pk>",adInventario,name="addInventario"),
     path("addInventario/",adInventario,name="addInventario"),
+    
     path("inventory/<pk>",inventarioHistoria,name="historia"),
     path("",previous_view,name="previous_view"),
     

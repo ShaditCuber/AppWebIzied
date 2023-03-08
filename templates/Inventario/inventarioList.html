@@ -2,10 +2,32 @@
 {% block content %}
 <div class="content-section ">
     <!-- modificar para bodegas -->
-    <a href="{% url 'addInventario' %}" class="btn btn-success btn-sm mb-2">Añadir</a>
-    <a class="btn btn-danger btn-sm mb-2"
-        href="{% url 'previous_view' %}?prev={{ request.resolver_match.url_name }}">Volver</a>
-    <h2>Filtro de Busqueda de Inventario</h2>
+
+
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Inventario</h2>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="{% url 'addInventario' %}" class="btn btn-success btn-sm mb-2">Añadir</a>
+            <a class="btn btn-danger btn-sm mb-2"
+                href="{% url 'previous_view' %}?prev={{ request.resolver_match.url_name }}">Volver</a>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card-body">
+            <form method="get">
+                {% for field in filtroPro.form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field}}
+                </div>
+                <br>
+                {% endfor %}
+                <button class="btn btn-primary btn-sm mb-2" type="submit">Buscar</button>
+            </form>
+        </div>
+    </div>
     <div class="col">
         <div class="card-body">
             <form method="get">
@@ -26,6 +48,8 @@
             <tr>
                 <th scope="col">Code</th>
                 <th scope="col">Cantidad</th>
+                <th scope="col">Ingreso o Salida Bodega</th>
+
             </tr>
         </thead>
         <tbody>
@@ -33,7 +57,7 @@
             <tr style="cursor:pointer;cursor: hand;" onclick="window.location=`{% url 'historia' in %}`">
                 <th scope="row">{{in}}</th>
                 <th scope="row">{{in.count_inventory}}</th>
-
+                <th scope="row"><a class="btn btn-primary btn-sm mb-2" href="{% url 'addInventario' in%}">I o S</a></th>
             </tr>
             {% endfor %}
         </tbody>

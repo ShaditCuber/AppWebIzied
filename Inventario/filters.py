@@ -17,3 +17,10 @@ class BodegaFiltro(django_filters.FilterSet):
     class Meta:
         model=Inventory
         fields=["idWarehouse"]
+        
+class StockFiltro(django_filters.FilterSet):
+    product = django_filters.CharFilter(field_name='product',label='Codigo')
+    
+    class Meta:
+        model=Stock
+        fields=["product"]
