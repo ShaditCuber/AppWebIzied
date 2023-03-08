@@ -34,7 +34,7 @@
         style="table-layout: fixed;">
         <thead class="thead-dark">
             <tr>
-                <th scope="col">Code</th>
+                <th scope="col">Nombre</th>
                 <th scope="col" class="d-none d-lg-table-cell">Precio $</th>
                 <th scope="col" class="d-none d-lg-table-cell">Insercion</th>
                 <th scope="col" class="d-none d-lg-table-cell">Actualizacion</th>
@@ -49,7 +49,7 @@
             {% for inventory in inventories %}
             <tr style="cursor:pointer;cursor: hand;"
                 onclick="window.location=`{% url 'xProductView' inventory.code %}`">
-                <th scope="row">{{inventory.code}}</th>
+                <th scope="row">{{inventory.resume}}</th>
                 <th scope="row" class="d-none d-lg-table-cell">$ {{inventory.priceUnit}}</th>
                 <th scope="row" class="d-none d-lg-table-cell">{{inventory.creationDate | date:"d/m/Y"}}</th>
                 <th scope="row" class="d-none d-lg-table-cell">{{inventory.updateDate | date:"d/m/Y"}}</th>
