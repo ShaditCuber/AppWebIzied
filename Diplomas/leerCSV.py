@@ -8,10 +8,10 @@ import boto3
 from fpdf import FPDF
 import math
 import time
-from PIL import ImageGrab, Image
 import plotly.graph_objs as go
 from plotly.graph_objs import Layout
 import numpy as np
+from encuestaOCR import ocr
 BUCKET_KEY = 'informes-diplomas'
 s3_client = boto3.client('s3')
 KEY='eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjUyNzcwNCwidWlkIjoyNTE1MDE3NCwiaWFkIjoiMjAyMi0xMC0xN1QyMzowMzoxMy4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.p4MW-Jjxo8GGKLfJ_Fif5EpYscJahLg9BXeNtj1GSXI'
@@ -26,9 +26,7 @@ def dataframe_to_lists(df):
         data.append(list(row.values))
     return data
 
-def leer(ruta,codigo):
-    
-    
+def leer(csvFile,encuestasFile,codigo):
     
     
     fila=None
@@ -98,7 +96,7 @@ def leer(ruta,codigo):
 
     
     os.makedirs(f'./tmp/{codigo}',exist_ok=True)
-    dfOriginal=pd.read_csv('./tmp/'+ruta)
+    dfOriginal=pd.read_csv('./tmp/'+csvFile)
     dfOriginal = dfOriginal.apply(lambda x: x.str.title() if x.dtype == "object" else x)
         
     merger = PdfMerger()
@@ -177,6 +175,8 @@ def leer(ruta,codigo):
     dfSinRut.columns = ['Nombres', 'Nota']
     cantidad=len(dfOriginal. index)
     partes=cantidad/12
+    if int(partes)==0:
+        partes=1 
     df_parts = np.array_split(dfSinRut, int(partes))
     # Crear figuras para cada una de las partes del dataframe
     figs = []
@@ -217,6 +217,8 @@ def leer(ruta,codigo):
     table['Porcentaje'] = table['Porcentaje'].round(2).apply(lambda x: f"{x}%")
     cantidadPorcentaje=len(table. index)
     partesP=cantidadPorcentaje/12
+    if int(partesP)==0:
+        partesP=1
     dfPartsPorcentaje = np.array_split(table, int(partesP))
     for i, part in enumerate(dfPartsPorcentaje):
         fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(table))]  # Color de fondo para filas pares e impares
@@ -343,11 +345,14 @@ def leer(ruta,codigo):
     base_dir='./static/assets'
     print("Generando Informe")
     pdf1 = FPDF()
-    pdf1.add_page(format = 'A4')
-
+    pdf1.add_page()
+    #eliminar pkl antes de subir a git uwu para no tenr problemas con las fuentes
     pdf1.image(base_dir + '\\base\\backgroundnohand.png', x = 0, y = 0, w = 210, h = 297)
-    pdf1.add_font('leagueSpartan', '', base_dir + "\\fonts\\league-spartan\\LeagueSpartan-Bold.ttf")
-    pdf1.add_font('openSansLight', '', base_dir + "\\fonts\\Open_Sans\\OpenSans-Light.ttf")
+    leaguePath=os.path.join(base_dir,'fonts','league-spartan','LeagueSpartan-Bold.ttf')
+    openPath=os.path.join(base_dir,'fonts','Open_Sans','OpenSans-Light.ttf')
+    
+    pdf1.add_font('leagueSpartan', '', leaguePath,uni=True)
+    pdf1.add_font('openSansLight', '', openPath,uni=True)
     pdf1.set_text_color(51,76,91) 
 
     now = datetime.datetime.now()
@@ -416,17 +421,29 @@ def leer(ruta,codigo):
         fill = False)
 
 
+    encuesta=ocr('./tmp/'+encuestasFile)
+    for i in encuesta:
+        figs.append(i)
+    
+    
     for tabla in figs:
-        pdf1.add_page('P','A4')
+        pdf1.add_page(orientation='P')
         pdf1.image(base_dir + '\\base\\background.png', x = 0, y = 0, w = 210, h = 297)
         pdf1.set_font('leagueSpartan','',28)
         pdf1.set_xy(12,42)
-        pdf1.multi_cell(190, 5,
-            'Resultados de la Evaluación',
+        if tabla.endswith('Encuesta.png'):
+            pdf1.multi_cell(190, 5,
+            'Resultados de la Encuesta',
             border = 0,
             align = 'C',
             fill = False)
-        
+        else:
+            pdf1.multi_cell(190, 5,
+                'Resultados de la Evaluación',
+                border = 0,
+                align = 'C',
+                fill = False)
+        print(tabla)
         pdf1.image(tabla, x = 0, y = 0, w = 210, h = 297)
 
     pdf1.output("./tmp/generado.pdf")
@@ -449,7 +466,7 @@ def leer(ruta,codigo):
 
 
 
-# leer('datos.csv','500000')
+leer('ejemplo.csv','encuestav4-2-resp.pdf','500000')
     
 
     
