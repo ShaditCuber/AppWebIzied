@@ -141,10 +141,14 @@ def ocr(ruta):
 
     for image in imagenes:
         a = cv2.imread(image)
-        x = 800
-        y = 500
-        ancho = 800
-        alto = 1500
+        # x = 800
+        # y = 500
+        # ancho = 800
+        # alto = 1500
+        x = 760
+        y = 460
+        ancho = 1000
+        alto = 1600
         # Recortamos la imagen utilizando cv2.crop()
         image = a[y:y+alto, x:x+ancho]
         # cv2.imshow('original',image)
@@ -194,7 +198,7 @@ def ocr(ruta):
             # cv2.imshow('result', warpedFrame)
             # cv2.waitKey(0)
         else:
-            print('Invalid frame')
+            print('Revisar a mano, mas de una respuestas marcada por fila')
 
 
 
@@ -237,7 +241,7 @@ def ocr(ruta):
                     marker_color='#6ec63b',
                     textfont=dict(color='black')
                 ),layout=layout)
-    fig.update_layout(title='Cantidad de alumnos por nota',title_x=.5)
+    fig.update_layout(title='Promedio por Pregunta',title_x=.5)
     name='./tmp/graficoEncuesta.png'
     fig.write_image(name,scale=6)
     figs.append(name)
@@ -247,6 +251,7 @@ def ocr(ruta):
         cells=dict(values=[x_labels, divididos]),
     ),layout=layout)
     name='./tmp/tablaEncuesta.png'
+    fig.update_layout(title='Tabla Promedio por Pregunta',title_x=.5)
     fig.write_image(name,scale=6)
     figs.append(name)
     

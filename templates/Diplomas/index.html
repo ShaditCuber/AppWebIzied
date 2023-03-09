@@ -8,10 +8,21 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Cargar archivo</button>
+        <button type="submit" id="boton">Cargar archivo</button>
     </form>
-
+    <div id="overlay"></div>
 
 </div>
+<script>
+    function showOverlay() {
+        document.getElementById("overlay").style.display = "block";
+    }
 
+    function hideOverlay() {
+        document.getElementById("overlay").style.display = "none";
+    }
+
+  // Llamamos a showOverlay() cuando el usuario hace clic en un botón o enlace que carga algo.
+  // Llamamos a hideOverlay() cuando la carga ha terminado (por ejemplo, cuando se completa una petición AJAX).
+</script>
 {% endblock %}

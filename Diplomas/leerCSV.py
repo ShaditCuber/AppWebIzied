@@ -11,7 +11,7 @@ import time
 import plotly.graph_objs as go
 from plotly.graph_objs import Layout
 import numpy as np
-from encuestaOCR import ocr
+from .encuestaOCR import ocr
 BUCKET_KEY = 'informes-diplomas'
 s3_client = boto3.client('s3')
 KEY='eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjUyNzcwNCwidWlkIjoyNTE1MDE3NCwiaWFkIjoiMjAyMi0xMC0xN1QyMzowMzoxMy4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.p4MW-Jjxo8GGKLfJ_Fif5EpYscJahLg9BXeNtj1GSXI'
@@ -152,7 +152,7 @@ def leer(csvFile,encuestasFile,codigo):
         c.drawString(x_fecha, 593, fechaFinal)
         c.save()
         s3_path = year + "/" + codigo + "/" + rut+".pdf"
-            
+        #Descomentar 
         # try:
         #     s3_client.upload_file(result_pdf, BUCKET_KEY, s3_path)
         #     print(s3_path)
@@ -166,7 +166,7 @@ def leer(csvFile,encuestasFile,codigo):
     diplomas=f'./tmp/{codigo}/Diplomas.pdf'
     merger.write(diplomas)
     merger.close()     
-    # mon.items.add_file_to_column(fila,'archivo2',diplomas)
+    mon.items.add_file_to_column(fila,'archivo2',diplomas)
     
     dfSinRut = dfOriginal.drop('rut', axis=1)
     # import dataframe_image as dfi
@@ -457,6 +457,8 @@ def leer(csvFile,encuestasFile,codigo):
     merger.append(base_dir+'/base/contraportada.pdf')
     merger.write("./tmp/Informe.pdf")
     merger.close()
+    mon.items.add_file_to_column(fila,'dup__of_orden_de_compra',diplomas)
+    
     # from shutil import rmtree
     # rmtree('./tmp/')
     # dir = './tmp/'
@@ -466,7 +468,6 @@ def leer(csvFile,encuestasFile,codigo):
 
 
 
-leer('ejemplo.csv','encuestav4-2-resp.pdf','500000')
     
 
     
