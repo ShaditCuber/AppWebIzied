@@ -342,7 +342,7 @@ def leer(csvFile,encuestasFile,codigo):
         fig = go.Figure(go.Bar(
                 x=dfBarras['Nota'],
                 y=dfBarras['Cantidad Alumnos'],
-                width=0.1,
+                width=0.4,
                 text=dfBarras['Cantidad Alumnos'], # agregar texto encima de cada barra
                 textposition='outside', # posición del texto
                 marker_color='#6ec63b',
@@ -459,7 +459,7 @@ def leer(csvFile,encuestasFile,codigo):
                 border = 0,
                 align = 'C',
                 fill = False)
-        pdf1.image(tabla, x = 55, y = 40, w = 113, h = 200)
+        pdf1.image(tabla, x = 55, y = 50, w = 113, h = 113)
 
     pdf1.output("./tmp/generado.pdf")
 

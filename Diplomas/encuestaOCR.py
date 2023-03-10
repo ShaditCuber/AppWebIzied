@@ -237,7 +237,7 @@ def ocr(ruta):
     fig = go.Figure(go.Bar(
                     x=x_labels,
                     y=y,
-                    width=1,
+                    width=0.4,
                     # text=yLabel, # agregar texto encima de cada barra
                     # textposition='outside', # posición del texto
                     marker_color='#6ec63b',
