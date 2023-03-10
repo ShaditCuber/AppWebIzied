@@ -11,7 +11,7 @@ import time
 import plotly.graph_objs as go
 from plotly.graph_objs import Layout
 import numpy as np
-from encuestaOCR import ocr
+from .encuestaOCR import ocr
 import shutil
 BUCKET_KEY = 'informes-diplomas'
 s3_client = boto3.client('s3')
