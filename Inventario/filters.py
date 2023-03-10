@@ -23,7 +23,21 @@ class BodegaFiltro(django_filters.FilterSet):
     class Meta:
         model=Inventory
         fields=["idWarehouse"]
+
+
+# class InventarioFiltro(django_filters.FilterSet):
+#     resume = django_filters.CharFilter(field_name='resume',label='Nombre',lookup_expr='icontains')
+#     code = django_filters.CharFilter(field_name='code',label='Codigo')
+#     idWarehouse = django_filters.ModelChoiceFilter(queryset=warehouse.objects.all(),label='Bodega',empty_label=None)
+
+#     class Meta:
+#         model=Inventory
+#         fields=["resume","code","idWarehouse"]
         
+    
+    
+    
+    
 class StockFiltro(django_filters.FilterSet):
     product = django_filters.CharFilter(field_name='product',label='Codigo')
     
