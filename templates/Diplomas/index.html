@@ -4,6 +4,7 @@
 <div class="content-section">
     <img src="{% static 'assets/image/fondo.png' %}" alt="" style="width: 100%;;">
     <br>
+    <div id="label"></div>
     <h2 style="text-align: center;" class="mt-5">Diplomas</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -38,15 +39,28 @@
         "Comprobando sistemas de soporte vital"
     ];
 
+    var acciones = [
+        "Generando Diplomas",
+        "Subiendo Diplomas",
+        "Leyendo Encuestas",
+        "Obteniendo Datos",
+        "Generando Informe",
+        "Aun sigo generando el informe",
+        "Subiendo informe"
+    ]
+
     var messageIndex = 0;
     var messageText = "";
     var intervalId;
-
+    var contador = 0
     function typeMessage() {
         showOverlay()
         if (messageIndex < messages.length) {
             messageText = messages[messageIndex];
             var messageElement = document.getElementById("loading-text");
+            var acc = document.getElementById("label");
+            acc.innerHTML = acciones[contador]
+            contador++
             messageElement.innerHTML = "";
             var i = 0;
             intervalId = setInterval(function () {
