@@ -11,12 +11,14 @@ import time
 import plotly.graph_objs as go
 from plotly.graph_objs import Layout
 import numpy as np
-from .encuestaOCR import ocr
+from encuestaOCR import ocr
+import shutil
 BUCKET_KEY = 'informes-diplomas'
 s3_client = boto3.client('s3')
 KEY='eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjUyNzcwNCwidWlkIjoyNTE1MDE3NCwiaWFkIjoiMjAyMi0xMC0xN1QyMzowMzoxMy4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.p4MW-Jjxo8GGKLfJ_Fif5EpYscJahLg9BXeNtj1GSXI'
 mon=MondayClient(KEY)
 BOARD_ID='3549229417'
+
 def dataframe_to_lists(df):
     data = []
     # Agregar encabezados
@@ -26,8 +28,7 @@ def dataframe_to_lists(df):
         data.append(list(row.values))
     return data
 
-def leer(csvFile,encuestasFile,codigo):
-    
+def leer(csvFile:str,encuestasFile:str,codigo:str):
     
     fila=None
     try:
@@ -47,9 +48,9 @@ def leer(csvFile,encuestasFile,codigo):
     informe=None
     
     modalidad=None
-    relatorNombre=None
-    relatorRut=None
-    relatorProfesion=None
+    # relatorNombre=None
+    # relatorRut=None
+    # relatorProfesion=None
     for i in datos:
         if i['id']=='texto14':
             curso=i['text'].title()
@@ -66,9 +67,22 @@ def leer(csvFile,encuestasFile,codigo):
         if i['id']=='estado9':
             modalidad=i['text'].title()
         if i['id']=='conectar_tableros1':
-            relatorNombre=(i['text'].split(','))[0]
-        
-    relatorDatos=mon.items.fetch_items_by_column_value('3549156018','name',relatorNombre)['data']['items_by_column_values'][0]['column_values']
+            relatoresNombres=i['text']
+    
+    RELATORES=relatoresNombres.split(',')
+    RELATORES_DATOS=[]
+    for relator in RELATORES:
+        datos=dict()
+        datos['Nombre']=relator
+        relatorDatos=mon.items.fetch_items_by_column_value('3549156018','name',relator.strip())['data']['items_by_column_values'][0]['column_values']
+        for dato in relatorDatos:
+            if dato['id']=='texto':
+                datos['Rut']=dato['text']
+            if dato['id']=='texto0':
+                datos['Profesion']=dato['text']
+        RELATORES_DATOS.append(datos)
+    print(RELATORES_DATOS)
+       
     for dato in relatorDatos:
         if dato['id']=='texto':
             relatorRut=dato['text']
@@ -111,7 +125,6 @@ def leer(csvFile,encuestasFile,codigo):
     dfOriginal = dfOriginal.apply(lambda x: x.str.title() if x.dtype == "object" else x)
         
     merger = PdfMerger()
-    #fecha y horas modificar
     
     
     for elemento,row in dfOriginal.iterrows():
@@ -124,7 +137,6 @@ def leer(csvFile,encuestasFile,codigo):
             result_pdf = f"./tmp/{codigo}/{rut}.pdf"
         c = canvas.Canvas(result_pdf, pagesize=(2000,1414))
         c.setFont('Helvetica',50)
-        #cambiar entre los dos tipos de Modalidad
         c.drawImage(base, 0, 0, width=2000, height=1414)
         x_nombre = (2000 - c.stringWidth(nombres)) / 2
         c.drawString(x_nombre, 995 , nombres)
@@ -186,12 +198,12 @@ def leer(csvFile,encuestasFile,codigo):
     if int(partes)==0:
         partes=1 
     df_parts = np.array_split(dfSinRut, int(partes))
-    # Crear figuras para cada una de las partes del dataframe
     figs = []
     #Creamos las tablas de Nombre - Nota
+    fill_colors = ['lavender' if i%2==0 else 'white' for i in range(12)]
     for i, part in enumerate(df_parts):
         
-        fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(part))]  # Color de fondo para filas pares e impares
+          # Color de fondo para filas pares e impares
         layout = Layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
@@ -232,8 +244,7 @@ def leer(csvFile,encuestasFile,codigo):
         partesP=1
     dfPartsPorcentaje = np.array_split(table, int(partesP))
     for i, part in enumerate(dfPartsPorcentaje):
-        fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(part))]  # Color de fondo para filas pares e impares
-        
+        fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(part))]
         if i == len(dfPartsPorcentaje) - 1:
             fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
             
@@ -251,66 +262,13 @@ def leer(csvFile,encuestasFile,codigo):
         fig.write_image(f'./tmp/tabla_notas_porcentaje-{i}.png',scale=6)
         figs.append(f'./tmp/tabla_notas_porcentaje-{i}.png')
     
-    # for i, part in enumerate(df_parts):
-    #     notas_grouped = part.groupby('Nota').agg({'Nota': 'count'})
-    #     print(notas_grouped)
-    #     exit()
-    #     notas_grouped.columns = ['Cantidad Alumnos']
-    #     notas_grouped['Porcentaje'] = notas_grouped['Cantidad Alumnos'] / notas_grouped['Cantidad Alumnos'].sum() * 100
-    #     notas_grouped['Porcentaje'] = notas_grouped['Porcentaje'].apply(lambda x: f"{int(x)}%")
-
-    #     notas_grouped.index.name = 'Nota'
-    #     notas_grouped.reset_index(inplace=True)
-    #     total_alumnos = part['Nota'].count()
-    #     fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(notas_grouped))]  # Color de fondo para filas pares e impares
-        
-    #     if i == len(df_parts) - 1:
-    #         # Add "Total" row to notas_agrupadas
-    #         notas_grouped.loc[len(notas_grouped)] = ['Total', total_alumnos, '100%']
-    #         fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
-        
-    #     fig = go.Figure(data=[
-    #                         go.Table(
-    #                             header=dict(values=list(notas_grouped.columns),align='center',fill_color='#6ec63b',font=dict(color='white')),
-    #                             cells=dict(values=notas_grouped.values.transpose(),
-    #                                     fill_color=[fill_colors],
-    #                                     align='center'
-    #                                     )
-    #                                 )
-    #                         ],layout=layout)
-    #     fig.write_image(f'./tmp/tabla_notas_porcentaje-{i}.png',scale=6)
-    #     figs.append(f'./tmp/tabla_notas_porcentaje-{i}.png')
-    # Definir los límites de los intervalos
-    
-    # bins=[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7]
-    # dfTablaNotas==
-    # # Crear una nueva columna en el dataframe con los intervalos correspondientes a cada nota
-    # dfSinRut['rango_notas'] = pd.cut(float(dfSinRut['Nota']), bins=bins)
-    # print(dfSinRut)
-    # # Agrupar el dataframe por los intervalos y contar la cantidad de alumnos en cada intervalo
-    # tabla_notas = part.groupby('rango_notas')['Nota'].agg(['count']).reset_index()
-    # print(tabla_notas)
-    # exit()
-    # # Renombrar las columnas
-    # tabla_notas.columns = ['Rango de Notas', 'Cantidad Alumnos']
-
-    # # Mostrar la tabla resultante
-    # print(tabla_notas)
-    
-    # exit()
+   
     table.drop(table.tail(1).index,inplace = True)
     dfBarras=table
     
     if cantidad>60:
-        # bins = [x/2 for x in range(2, 15)]
-        # labels = [f'{x-.5} - {x}' for x in bins]
         dfBarras = dfBarras.drop('Porcentaje', axis=1)
         dfBarras=dfBarras.iloc[:-1]
-        # notas_grouped['rango_notas'] = pd.cut(notas_grouped['Nota'], bins=range(0, 110, 10))
-        # df_grouped = notas_grouped.groupby('rango_notas')['Cantidad Alumnos'].sum().reset_index()
-        # fig=go.Figure(go.Bar(x=df_grouped['rango_notas'], y=df_grouped['Cantidad Alumnos']),layout=layout)
-        # print(fig)
-        # fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
         dfBarras['rango_notas'] = pd.cut(dfBarras['Nota'], bins=[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7])
         dfBarras = dfBarras.groupby('rango_notas')['Cantidad Alumnos'].sum().reset_index()
         dfBarras['rango_notas_str'] = dfBarras['rango_notas'].astype(str)
@@ -319,23 +277,6 @@ def leer(csvFile,encuestasFile,codigo):
         fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
         figs.append('./tmp/tabla_notas_barras.png')
         
-        # dfBarras['Nota']=dfBarras['Nota'].apply(lambda x: int(x))
-        # dfBarras['Nota Rango'] = pd.cut(dfBarras['Nota'], bins=bins, labels=labels)
-        # dfBarras['Nota Rango Num'] = dfBarras['Nota Rango'].apply(lambda x: (float(x.split('-')[0].strip()) + float(x.split('-')[1].strip())) / 2)
-
-        # dfBarras = dfBarras.groupby('Nota Rango Num').sum().reset_index()
-
-        # fig = go.Figure(go.Bar(
-        #     x=dfBarras['Nota Rango Num'],
-        #     y=dfBarras['Cantidad Alumnos'],
-        #     width=0.4,
-        #     text=dfBarras['Cantidad Alumnos'],
-        #     textposition='auto',
-        #     marker_color='#6ec63b',
-        #     textfont=dict(color='black')
-        # ),layout=layout)
-        # fig.update_layout(title='Cantidad de alumnos por nota',title_x=.5)
-        # fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
     else:
         dfBarras = dfBarras.groupby('Nota').agg({'Nota': 'count'})
         dfBarras.columns = ['Cantidad Alumnos']
@@ -361,6 +302,8 @@ def leer(csvFile,encuestasFile,codigo):
     pdf1.add_page()
     #eliminar pkl antes de subir a git uwu para no tenr problemas con las fuentes
     backgroundNoHand=os.path.join(base_dir,'base','backgroundnohand.png')
+    background=os.path.join(base_dir,'base','background.png')
+    
     pdf1.image(backgroundNoHand, x = 0, y = 0, w = 210, h = 297)
     leaguePath=os.path.join(base_dir,'fonts','league-spartan','LeagueSpartan-Bold.ttf')
     openPath=os.path.join(base_dir,'fonts','Open_Sans','OpenSans-Light.ttf')
@@ -414,25 +357,54 @@ def leer(csvFile,encuestasFile,codigo):
         align = 'J',
         fill = False)
 
-    pdf1.set_font('leagueSpartan','',14)
-    pdf1.set_xy(25,180)
-    pdf1.multi_cell(160, 9,
-        'RELATOR',
-        border = 0,
-        align = 'L',
-        fill = False)
+    #Añadiendo Relatores
+    COLOR_AZUL = [51, 76, 91]
+    foto=os.path.join(base_dir,'base','relatore.png')
+    if len(RELATORES) == 1:
+        pdf1.set_font('leagueSpartan','',14)
+        pdf1.set_xy(25,180)
+        pdf1.multi_cell(w = 160, h = 9, txt = 'RELATOR', align = 'L')
+        padd_x = 25
+        pdf1.image(foto, x = 25, y = 190 + 2.5, w = 30, h = 30) 
+        padd_x = 60
+                
 
-    pdf1.set_font('openSansLight','',16)
-    pdf1.set_xy(25,190)
-    #Correo??
-    pdf1.multi_cell(160, 9,
-        """{0}
-    Rut: {1}
-    Correo Electrónico: contacto@huellascapacitaciones.cl
-    Profesión: {2}""".format(relatorNombre, relatorRut, relatorProfesion),
-        border = 0,
-        align = 'L',
-        fill = False)
+        pdf1.set_font('openSansLight','',16)
+        pdf1.set_xy(padd_x,190)
+        pdf1.multi_cell(w = 160, h = 9,
+            txt = """{}
+        Rut: {}
+        Correo Electrónico: contacto@huellascapacitaciones.cl
+        Profesión: {}""".format(RELATORES_DATOS[0]['Nombre'],RELATORES_DATOS[0]['Rut'],RELATORES_DATOS[0]['Profesion']),
+            align = 'L')
+    else:
+        pdf1.add_page()
+        pdf1.image(background, x = 0, y = 0, w = 210, h = 297)
+        pdf1.set_text_color(*COLOR_AZUL)
+        pdf1.set_font('leagueSpartan','',28)
+        pdf1.set_xy(40,42)
+        pdf1.multi_cell(w = 190, h = 5, txt = 'Relatores', align = 'L')
+
+        base_y = 60
+        for relator in RELATORES_DATOS:
+            padd_x = 25
+            pdf1.image(foto, x = 25, y = base_y + 2.5, w = 30, h = 30)  
+            padd_x = 60
+
+            pdf1.set_font('leagueSpartan','',14)
+            pdf1.set_xy(padd_x, base_y)
+            pdf1.multi_cell(w = 160, h = 9, txt = relator['Nombre'], align = 'L')
+                
+            pdf1.set_font('openSansLight','',16)
+            pdf1.set_xy(padd_x, base_y+10)
+            pdf1.multi_cell(w = 160, h = 9,
+                txt = """Rut: {0} \nCorreo Electrónico: contacto@huellascapacitaciones.cl \nProfesión: {1}""".format(
+                    relator['Rut'], 
+                    relator['Profesion']), 
+                align = 'L')
+            base_y += 50
+    
+
 
 
     encuesta,promedioCurso,promedioRelator=ocr('./tmp/'+encuestasFile)
@@ -442,12 +414,10 @@ def leer(csvFile,encuestasFile,codigo):
     for i in encuesta:
         figs.append(i)
     
-    background=os.path.join(base_dir,'base','background.png')
     
     for tabla in figs:
         pdf1.add_page(orientation='P')
         pdf1.image(background, x = 0, y = 0, w = 210, h = 297)
-        # pdf1.image(background, x = 0, y = 0, w = 113, h = 200)
         pdf1.set_font('leagueSpartan','',28)
         pdf1.set_xy(12,42)
         if tabla.endswith('Encuesta.png'):
@@ -462,7 +432,7 @@ def leer(csvFile,encuestasFile,codigo):
                 border = 0,
                 align = 'C',
                 fill = False)
-        pdf1.image(tabla, x = 0, y = 50, w = 200, h = 200)
+        pdf1.image(tabla, x = 5, y = 50, w = 200, h = 200)
 
     pdf1.output("./tmp/generado.pdf")
 
@@ -478,8 +448,6 @@ def leer(csvFile,encuestasFile,codigo):
     merger.close()
     mon.items.add_file_to_column(fila,'dup__of_orden_de_compra',informe)
     
-
-    import shutil
 
     direc = './tmp/'
     for f in os.listdir(direc):
@@ -497,6 +465,5 @@ def leer(csvFile,encuestasFile,codigo):
 
     
 
-    
     
     

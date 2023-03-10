@@ -247,10 +247,26 @@ def ocr(ruta):
     name='./tmp/graficoEncuesta.png'
     fig.write_image(name,scale=6)
     figs.append(name)
+    
+    
+    
+    preguntas=[
+       "Los contenidos son pertinentes a los objetivos generales y específicos que aborda el curso",
+       "El curso presenta una estructuración lógica de los contenidos que facilita su comprensión",
+       "La metodología utilizada para impartir los conocimientos facilita alcanzar los objetivos de aprendizaje",
+       "El relator muestra un alto nivel de conocimientos en el tema expuesto",
+       "El relator muestra una buena disposición hacia los alumnos, resolviendo dudas y reforzando ideas principales",
+       "El relator cumple con los horarios de inicio, receso y término de la actividad ",
+       "El recinto en el cual se dicta la capacitación tiene adecuadas condiciones de higiene y seguridad",
+       "El recinto en el cual se dicta la capacitación cuenta con adecuada iluminación, acústica y equipos audiovisuales",
+       "El servicio de catering entregado cumple con estándares de calidad, acordes a lo comprometido",
+       "El material de apoyo utilizado durante el curso (ppt, video,etc) están diseñados y presentados con calidad suficiente",
+       "Se utilizan imágenes, gráficos, ejemplos o animaciones para facilitar su comprensión"
+    ]
     # Crear la figura y agregar la tabla
     fig = go.Figure(go.Table(
         header=dict(values=["Pregunta", "Promedio"],align='center',fill_color='#6ec63b',font=dict(color='white')),
-        cells=dict(values=[x_labels, divididos]),
+        cells=dict(values=[preguntas, divididos]),
     ),layout=layout)
     name='./tmp/tablaEncuesta.png'
     fig.update_layout(title='Tabla Promedio por Pregunta',title_x=.5)
