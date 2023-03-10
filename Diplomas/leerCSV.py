@@ -298,6 +298,7 @@ def leer(csvFile,encuestasFile,codigo):
     # print(tabla_notas)
     
     # exit()
+    table.drop(table.tail(1).index,inplace = True)
     dfBarras=table
     
     if cantidad>60:
