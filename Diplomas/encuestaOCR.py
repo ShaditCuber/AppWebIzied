@@ -268,7 +268,7 @@ def ocr(ruta):
         columnorder = [1,2],
         columnwidth = [510,70],
         header=dict(values=["Pregunta", "Promedio"],align='center',fill_color='#6ec63b',font=dict(color='white')),
-        cells=dict(values=[preguntas, divididos],font_size=7,height=10),
+        cells=dict(values=[preguntas, divididos],font_size=7),
     ),layout=layout)
     name='./tmp/tablaEncuesta.png'
     fig.update_layout(title='Tabla Promedio por Pregunta',title_x=.5)
