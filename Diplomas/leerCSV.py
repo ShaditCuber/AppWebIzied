@@ -431,8 +431,8 @@ def leer(csvFile,encuestasFile,codigo):
     background=os.path.join(base_dir,'base','background.png')
     for tabla in figs:
         pdf1.add_page(orientation='P')
-        # pdf1.image(background, x = 0, y = 0, w = 210, h = 297)
-        pdf1.image(background, x = 0, y = 0, w = 113, h = 200)
+        pdf1.image(background, x = 0, y = 0, w = 210, h = 297)
+        # pdf1.image(background, x = 0, y = 0, w = 113, h = 200)
         pdf1.set_font('leagueSpartan','',28)
         pdf1.set_xy(12,42)
         if tabla.endswith('Encuesta.png'):
@@ -448,7 +448,7 @@ def leer(csvFile,encuestasFile,codigo):
                 align = 'C',
                 fill = False)
         print(tabla)
-        pdf1.image(tabla, x = 0, y = 0, w = 210, h = 297)
+        pdf1.image(tabla, x = 0, y = 0, w = 113, h = 200)
 
     pdf1.output("./tmp/generado.pdf")
 
@@ -465,9 +465,18 @@ def leer(csvFile,encuestasFile,codigo):
     mon.items.add_file_to_column(fila,'dup__of_orden_de_compra',informe)
     
 
+    import shutil
+
     direc = './tmp/'
     for f in os.listdir(direc):
-        os.remove(os.path.join(direc, f))
+        path = os.path.join(direc, f)
+        try:
+            if os.path.isfile(path):
+                os.remove(path)
+            elif os.path.isdir(path):
+                shutil.rmtree(path)
+        except Exception as e:
+            print(f'Error al borrar {path}: {e}')
     return 200
 
 
