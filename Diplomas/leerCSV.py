@@ -225,6 +225,7 @@ def leer(csvFile,encuestasFile,codigo):
     table.reset_index(inplace=True)
     total_alumnos = counts.sum()
     table['Porcentaje'] = table['Porcentaje'].round(2).apply(lambda x: f"{x}%")
+    table.loc[len(part)] = ['Total', total_alumnos, '100%']
     cantidadPorcentaje=len(table. index)
     partesP=cantidadPorcentaje/12
     if int(partesP)==0:
@@ -234,7 +235,6 @@ def leer(csvFile,encuestasFile,codigo):
         fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(part))]  # Color de fondo para filas pares e impares
         
         if i == len(dfPartsPorcentaje) - 1:
-            part.loc[len(part)] = ['Total', total_alumnos, '100%']
             fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
             
         
