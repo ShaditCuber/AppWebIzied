@@ -440,6 +440,7 @@ def leer(csvFile,encuestasFile,codigo):
         figs.append(i)
     
     background=os.path.join(base_dir,'base','background.png')
+    
     for tabla in figs:
         pdf1.add_page(orientation='P')
         pdf1.image(background, x = 0, y = 0, w = 210, h = 297)
@@ -458,8 +459,7 @@ def leer(csvFile,encuestasFile,codigo):
                 border = 0,
                 align = 'C',
                 fill = False)
-        print(tabla)
-        pdf1.image(tabla, x = 0, y = 0, w = 113, h = 200)
+        pdf1.image(tabla, x = 600, y = 800, w = 113, h = 200)
 
     pdf1.output("./tmp/generado.pdf")
 
