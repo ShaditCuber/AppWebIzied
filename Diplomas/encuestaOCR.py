@@ -266,7 +266,7 @@ def ocr(ruta):
     # Crear la figura y agregar la tabla
     fig = go.Figure(go.Table(
         header=dict(values=["Pregunta", "Promedio"],align='center',fill_color='#6ec63b',font=dict(color='white')),
-        cells=dict(values=[preguntas, divididos]),
+        cells=dict(values=[preguntas, divididos],style={'whiteSpace': 'normal', 'height': 'auto'}),
     ),layout=layout)
     name='./tmp/tablaEncuesta.png'
     fig.update_layout(title='Tabla Promedio por Pregunta',title_x=.5)
