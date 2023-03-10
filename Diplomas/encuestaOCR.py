@@ -124,7 +124,9 @@ class BubbleSheetScanner:
 
 def ocr(ruta):
     # Store Pdf with convert_from_path function
-    images = convert_from_path(ruta,poppler_path=r'C:\Users\56993\Downloads\poppler-0.68.0\bin')
+    # images = convert_from_path(ruta,poppler_path=r'C:\Users\56993\Downloads\poppler-0.68.0\bin')
+    images = convert_from_path(ruta)
+    
     imagenes=[]
     cantidadEncuestas=len(images)
     for i in range(len(images)):
