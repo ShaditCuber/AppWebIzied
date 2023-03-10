@@ -11,7 +11,7 @@ import time
 import plotly.graph_objs as go
 from plotly.graph_objs import Layout
 import numpy as np
-from .encuestaOCR import ocr
+from encuestaOCR import ocr
 import shutil
 BUCKET_KEY = 'informes-diplomas'
 s3_client = boto3.client('s3')
@@ -83,11 +83,11 @@ def leer(csvFile:str,encuestasFile:str,codigo:str):
         RELATORES_DATOS.append(datos)
     print(RELATORES_DATOS)
        
-    for dato in relatorDatos:
-        if dato['id']=='texto':
-            relatorRut=dato['text']
-        if dato['id']=='texto0':
-            relatorProfesion=dato['text']
+    # for dato in relatorDatos:
+    #     if dato['id']=='texto':
+    #         relatorRut=dato['text']
+    #     if dato['id']=='texto0':
+    #         relatorProfesion=dato['text']
             
     if modalidad.strip()=='No informa':
         return 401
@@ -465,5 +465,5 @@ def leer(csvFile:str,encuestasFile:str,codigo:str):
 
     
 
-    
+
     
