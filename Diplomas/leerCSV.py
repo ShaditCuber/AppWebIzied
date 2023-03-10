@@ -459,7 +459,7 @@ def leer(csvFile,encuestasFile,codigo):
                 border = 0,
                 align = 'C',
                 fill = False)
-        pdf1.image(tabla, x = 60, y = 10, w = 113, h = 200)
+        pdf1.image(tabla, x = 55, y = 40, w = 113, h = 200)
 
     pdf1.output("./tmp/generado.pdf")
 
