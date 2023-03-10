@@ -38,14 +38,29 @@ def index(request):
                 if resp==200:
                     messages.success(request,"Informes cargados correctamente en Monday")
                     return redirect('informe_diplomas')
+                if resp==400:
+                    messages.warning(request,"No existe el curso en Monday")
+                    return redirect('informe_diplomas')
                 if resp==401:
-                    messages.warning(request,"No hay datos del Curso")
+                    messages.warning(request,"No existe la Columna Modalidad en Monday")
                     return redirect('informe_diplomas')
                 if resp==402:
-                    messages.warning(request,"Ya existen diplomas en Monday , Elimine el archivo si desea gernerarlos nuevamente")
+                    messages.warning(request,"No existe la Columna Nombre Curso en Monday")
                     return redirect('informe_diplomas')
                 if resp==403:
-                    messages.warning(request,"No existe el curso en Monday")
+                    messages.warning(request,"No existe la Columna Institucion en Monday")
+                    return redirect('informe_diplomas')
+                if resp==404:
+                    messages.warning(request,"No existe la Columna Horas en Monday")
+                    return redirect('informe_diplomas')
+                if resp==405:
+                    messages.warning(request,"No existe la Columna Fecha en Monday")
+                    return redirect('informe_diplomas')
+                if resp==500:
+                    messages.warning(request,"Ya existen Diplomas en Monday , Elimine el archivo si desea generarlos nuevamente")
+                    return redirect('informe_diplomas')
+                if resp==501:
+                    messages.warning(request,"Ya existe Informe en Monday , Elimine el archivo si desea generarlos nuevamente")
                     return redirect('informe_diplomas')
             else:
                 messages.warning(request,"Falta cargar algun archivo")

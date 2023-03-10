@@ -36,7 +36,7 @@ def leer(csvFile,encuestasFile,codigo):
         pass
     
     if not fila:
-        return 403
+        return 400
         
     datos=mon.items.fetch_items_by_id(fila)['data']['items'][0]['column_values']
     curso=None
@@ -44,6 +44,8 @@ def leer(csvFile,encuestasFile,codigo):
     horas=None
     fecha =None
     archivo=None
+    informe=None
+    
     modalidad=None
     relatorNombre=None
     relatorRut=None
@@ -59,6 +61,8 @@ def leer(csvFile,encuestasFile,codigo):
             fecha=i['text']
         if i['id']=='archivo2':
             archivo=i['text']
+        if i['id']=='dup__of_orden_de_compra':
+            informe=i['text']
         if i['id']=='estado9':
             modalidad=i['text'].title()
         if i['id']=='conectar_tableros1':
@@ -73,12 +77,19 @@ def leer(csvFile,encuestasFile,codigo):
             
     if modalidad.strip()=='No informa':
         return 401
-    if not curso and not institucion and not horas and not fecha:
-        return 401
-    
-        
-    if archivo:
+    if not curso:
         return 402
+    if not institucion:
+        return 403
+    if not horas:
+        return 404
+    if not fecha:
+        return 405
+    if archivo:
+        return 500
+    if informe:
+        return 501
+    
     if modalidad=='Presencial':
         base='./static/assets/image/17.png'
         y_horas=700
