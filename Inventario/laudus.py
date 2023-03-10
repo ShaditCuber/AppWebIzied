@@ -2,11 +2,20 @@ import requests
 import json
 import time
 import datetime
+
 HEADERS = {
-  'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiZzVBL2VQYVpOdDdpOGtvK2J0OXJkZDNZUDFhMHZ6SUxyS1kzWFhoOFdrNVdSRzBiV2RNaU5jNyt1c3l5MGtYK2tKaU5CVWR0cmNOMC84TXZqRGUzZUVSdUZyRFZ6SlQzM1RkN1RWWS9QSE1kK21BOGg1b21KdENoeS9aY2VUTVJaM0owZ3NUdTIrTzlmc2hncnc2YmFmNmxTcjFQWWNhbU9LOUlhdE1jWWNiRWU2bklJdWFONm9wQTZ1YWVmT0ZrL2g3QXc3cjIzWDF6RnJ1S0crdThuWHFNYWVwRGE5bTU5cmhPTGowNkNlTmxTZUhWb2hMdmE5R2JJbGN2SHJNQnFMTFdpbkdvbXhEZ0JtM0s2ZkYzVThkNmJseUNhTmxDeEt0enVkenpYTWFQcGFuK01LV1RiblcxUERoMmdkcUgxM1lVNDBzaU45d2hUUGFhdVZJNkd4bG81Z3hRajVhRHF1MUwxYXY4R0pnVHNtd0EyNDNoYkZZPSJ9.h81ci8nHkUMV-NsqRydaXKMyIk8did3TNDCIjgLkehw',
+  'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiamtLQWZIekRXTmkzMjVveVFXeHBzeVFISVhMTjFXd2I3SmMyWG9LSFF6ZGh5aHpORFhHZkdFdzlKdVhoenpZQ3F4d3lMZnNUT3VjNDdaTUFySUlGV2lBMEV1ZlFtemtUajRyN2RTY1BpSWNCUG4xeHNuekNNTUpncTEweWZvamdtRXNldEdaZmV3WVVwMnZWcGxJOGtheENneGlXU3NHSktTMmR0aitmck9zZWlwZnVmYUxxNG5BUS80QkkzMlkxT0F6eWJ4ZFZIaEc2N1hlemdFYVFLRytFTFlXNHF6UHFUM2N3Z0ZxSVRQWkpXSXR1cGxCMEdjWVZUL3psOEs5Z3l6Zlg0ekVwbUg1NXBoRFZhYVRwOFVJU1RWRWFsbGIyZHRuMUNiWUZIM0pYNWNZOEloNEJKeFFEcndQUEdicDlnUlJTalUxNDNTYVQ5YStwV0Zhamo5Q0hOUGVDN0ttcjZBNm5IaVozbGFpT0tscThWUmlHajFzPSJ9.1bLy90S7ZpT6gSVk6aGO64wd0opZVq0tcfDRMg5UeDE',
   'Content-Type': 'application/json'
 }
 URL='https://api.laudus.cl/'
+
+
+def validarToken():
+    funcion='security/checkToken'
+    data=requests.get(URL+funcion,headers=HEADERS).text
+    return 'TOKEN_EXPIRED' not in data
+         
+
 
 def limpiarString(string_1):
     """Compara dos strings ignorando mayusculas, tildes y limpiandolas primero"""
@@ -55,8 +64,28 @@ def eliminarProducto(idLaudus):
     return 'error' in data
     
 
-def actualizarProducto():
-    pass
+def actualizarProducto(idLaudus:str,description:str,unitPrice:str):
+    funcion='production/products/{}'.format(idLaudus)
+    payload = """{{
+    "productId": {},
+    "description": "{}",
+    "allowFreeDescription": "true",
+    "type": "s",
+    
+    "unitPrice": {},
+    "unitOfMeasure": "unidad",
+    "notes": "string",
+    "createdBy": {{
+        "userId": "st",
+        "name": "string"
+    }},
+    "modifiedBy": {{
+        "userId": "st",
+        "name": "string"
+        }}
+    }}""".format(idLaudus,limpiarString(description), unitPrice)
+    data=requests.put(URL+funcion,headers=HEADERS,data=payload).json()
+    return data['productId']!=None
 
 def crearBodega(nombre:str):
     funcion='production/warehouses'

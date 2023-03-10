@@ -9,9 +9,13 @@ import plotly
 import plotly.express as px
 import json
 from .laudus import *
+import pytz
 # Create your views here.
-
-
+now_utc = datetime.datetime.now(datetime.timezone.utc)
+# Ajustar a la zona horaria de Chile
+timezone = pytz.timezone('America/Santiago')
+now_cl = now_utc.astimezone(timezone)
+actualChile=now_cl.strftime('%Y-%m-%d')
 def previous_view(request):
     previous_view_name = request.GET.get('prev', None)
     if previous_view_name is not None:
@@ -19,7 +23,7 @@ def previous_view(request):
         return redirect(previous_view_url)
     else:
         # Si no se proporciona una vista anterior, redirige a una página predeterminada
-        return redirect('home')
+        return redirect('index')
 
 def index(request):
     context={"title":"Inicio"}
@@ -27,12 +31,15 @@ def index(request):
 
 
 def inventoryList(request):
-    inventories=Inventory.objects.all()
-    filtro=OrderFilter(request.GET,queryset=inventories)
-    inventories=filtro.qs
-    context={"title":"Lista Inventario","inventories":inventories,"filtro":filtro}
-    return render(request,"Inventario/listaProductos.html",context=context)
-
+    if validarToken():
+        inventories=Inventory.objects.all()
+        filtro=OrderFilter(request.GET,queryset=inventories)
+        inventories=filtro.qs
+        context={"title":"Lista Inventario","inventories":inventories,"filtro":filtro}
+        return render(request,"Inventario/listaProductos.html",context=context)
+    else:
+        messages.warning(request,"EL TOKEN DE LAUDUS A EXPIRADO , CONTACTA A UN PROGRAMADOR")
+        return redirect('index')
 
 def xProductView(request,pk):
     inventory=get_object_or_404(Inventory,pk=pk)
@@ -82,12 +89,14 @@ def updateProduct(request,pk):
     if request.method=="POST":
         updateForm=actualizar(data=request.POST)
         if updateForm.is_valid():
-            inventory.priceUnit=updateForm.data['priceUnit']
-            inventory.resume=updateForm.data['resume']
-            inventory.save()
-            messages.success(request,"Producto Actualizado Correctamente")
-            
-            return redirect(f'/producto/{pk}')
+            if actualizarProducto(inventory.idLaudus,updateForm.data['resume'],updateForm.data['priceUnit']):
+                inventory.priceUnit=updateForm.data['priceUnit']
+                inventory.resume=updateForm.data['resume']
+                inventory.updateDate=actualChile
+                inventory.save()
+                messages.success(request,"Producto Actualizado Correctamente")
+                
+                return redirect(f'/producto/{pk}')
     else:
         updateForm=actualizar(instance=inventory)
     
@@ -96,20 +105,27 @@ def updateProduct(request,pk):
 
 
 def bodegaList(request):
-    bodegas=warehouse.objects.all()
-    context={"title":"Lista Bodegas","bodegas":bodegas}
-    return render(request,"Inventario/bodegaList.html",context=context)
-    
+    if validarToken():
+        bodegas=warehouse.objects.all()
+        context={"title":"Lista Bodegas","bodegas":bodegas}
+        return render(request,"Inventario/bodegaList.html",context=context)
+    else:
+        messages.warning(request,"EL TOKEN DE LAUDUS A EXPIRADO , CONTACTA A UN PROGRAMADOR")
+        return redirect('index')
 
 def inventarioList(request):
-    inventario=Inventory.objects.all()
-    filtro=BodegaFiltro(request.GET,queryset=inventario)
-    inventario=filtro.qs
-    filtroPro=OrderFilter(request.GET,queryset=inventario)
-    inventario=filtroPro.qs
-    context={"title":"Lista Inventario","inventario":inventario,"filtro":filtro,"filtroPro":filtroPro}
-    return render(request,"Inventario/inventarioList.html",context=context)
-
+    # validarToken()
+    if validarToken():
+        inventario=Inventory.objects.all()
+        filtro=BodegaFiltro(request.GET,queryset=inventario)
+        inventario=filtro.qs
+        filtroPro=OrderFilter(request.GET,queryset=inventario)
+        inventario=filtroPro.qs
+        context={"title":"Lista Inventario","inventario":inventario,"filtro":filtro,"filtroPro":filtroPro}
+        return render(request,"Inventario/inventarioList.html",context=context)
+    else:
+        messages.warning(request,"EL TOKEN DE LAUDUS A EXPIRADO , CONTACTA A UN PROGRAMADOR")
+        return redirect('index')
 
 def inventarioHistoria(request,pk):
     context=dict()

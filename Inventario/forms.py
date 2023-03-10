@@ -56,7 +56,8 @@ class actualizar(ModelForm):
     
     idWarehouse = forms.ModelChoiceField(
         queryset=warehouse.objects.all(),
-        required=True,
+        required=False,
+        disabled=True,
         help_text="bodega",
         label="Bodega",
         to_field_name="id" # opcional si desea utilizar el campo 'id' como valor de la opción en lugar del objeto completo
