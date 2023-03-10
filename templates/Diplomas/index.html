@@ -74,7 +74,16 @@
             }, 100);
         }
     }
-    document.getElementById("boton").addEventListener("click", typeMessage);
+    document.getElementById("boton").addEventListener("click", function () {
+        // Obtener el campo de entrada de archivos
+        var fileInput = document.getElementById("id_archivo");
+
+        // Verificar si el campo de entrada de archivos tiene un archivo cargado
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            // Si hay archivos cargados, realizar la acción
+            typeMessage();
+        }
+    });
     hideOverlay()
     document.getElementById("diplomas").style.display = "block";
 
