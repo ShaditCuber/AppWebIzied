@@ -103,19 +103,24 @@ def leer(csvFile:str,encuestasFile:str,codigo:str):
         return 500
     if informe:
         return 501
+    # Obtener la ruta absoluta de la carpeta del proyecto
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # Concatenar la ruta de la carpeta de las imágenes
+    ruta_imagenes = os.path.join(BASE_DIR, 'static', 'assets', 'image')
     
     if modalidad=='Presencial':
-        base='./static/assets/image/17.png'
+        base=os.path.join(ruta_imagenes, '17.png')
         y_horas=700
         tipoFecha=1
     if modalidad=='Sincrónico':
         y_horas=679
-        base='./static/assets/image/18.png'
+        base=os.path.join(ruta_imagenes, '18.png')
         tipoFecha=2
         
     if modalidad=='Sincrónico/Presencial':
         y_horas=679
-        base='./static/assets/image/19.png'
+        base=os.path.join(ruta_imagenes, '19.png')
         tipoFecha=2
         
 
@@ -296,7 +301,8 @@ def leer(csvFile:str,encuestasFile:str,codigo:str):
         fig.write_image('./tmp/tabla_notas_barras.png',scale=6)
         figs.append('./tmp/tabla_notas_barras.png')
 
-    base_dir='./static/assets'
+    
+    base_dir=os.path.join(BASE_DIR,'static','assets')
     print("Generando Informe")
     pdf1 = FPDF()
     pdf1.add_page()
