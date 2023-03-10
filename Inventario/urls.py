@@ -14,8 +14,9 @@ urlpatterns = [
     path("inventario/",inventarioList,name="inventario"),
     path("addInventario/<pk>",adInventario,name="addInventario"),
     path("addInventario/",adInventario,name="addInventario"),
-    
     path("inventory/<pk>",inventarioHistoria,name="historia"),
+    path("registroPresencial/",registroPresencial,name="registro"),
+
     path("",previous_view,name="previous_view"),
     
     

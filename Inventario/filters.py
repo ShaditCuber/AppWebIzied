@@ -18,7 +18,7 @@ class CodeFiltro(django_filters.FilterSet):
         exclude=["creationDate","updateDate"]
 
 class BodegaFiltro(django_filters.FilterSet):
-    idWarehouse = django_filters.ModelChoiceFilter(queryset=warehouse.objects.all(),label='Bodega',initial=warehouse.objects.all().first(),empty_label=None)
+    idWarehouse = django_filters.ModelChoiceFilter(queryset=warehouse.objects.all(),label='Bodega',initial='Seleccione',empty_label=None)
     
     class Meta:
         model=Inventory

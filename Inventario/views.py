@@ -121,9 +121,13 @@ def inventarioList(request):
         inventario=Inventory.objects.all()
         filtro=BodegaFiltro(request.GET,queryset=inventario)
         inventario=filtro.qs
-        filtroPro=CodeFiltro(request.GET,queryset=inventario)
-        inventario=filtroPro.qs
-        context={"title":"Lista Inventario","inventario":inventario,"filtro":filtro,"filtroPro":filtroPro}
+        filtroCode=CodeFiltro(request.GET,queryset=inventario)
+        inventario=filtroCode.qs
+        filtroN=DescripcionFiltro(request.GET,queryset=inventario)
+        inventario=filtroN.qs
+        # context={"title":"Lista Inventario","inventario":inventario,"filtro":filtro,"filtroPro":filtroPro,"filtroN":filtroN}
+        context={"title":"Lista Inventario","inventario":inventario,"filtroN":filtroN,"filtroCode":filtroCode,"filtro":filtro}
+        
         return render(request,"Inventario/inventarioList.html",context=context)
     else:
         messages.warning(request,"EL TOKEN DE LAUDUS A EXPIRADO , CONTACTA A UN PROGRAMADOR")
@@ -228,6 +232,8 @@ def dashboard(request):
     return render(request,"Inventario/dashboard.html", context=context)
 
 
+def registroPresencial(request):
+    return render(request,"Inventario/registroPresencial.html")
 
 def informe_diplomas(request):
     return render(request,"Inventario/index.html")
