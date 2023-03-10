@@ -36,7 +36,7 @@ def index(request):
             if csvFile and encuestasFile:
                 resp=leer(csvFile,encuestasFile,codigo)
                 if resp==200:
-                    messages.success(request,"Informes cargados correctamente en Monday")
+                    messages.success(request,"Informe y Diplomas cargados correctamente en Monday")
                     return redirect('informe_diplomas')
                 if resp==400:
                     messages.warning(request,"No existe el curso en Monday")
