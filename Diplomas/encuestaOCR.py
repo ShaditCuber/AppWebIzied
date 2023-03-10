@@ -265,6 +265,8 @@ def ocr(ruta):
     ]
     # Crear la figura y agregar la tabla
     fig = go.Figure(go.Table(
+        columnorder = [2,1],
+        columnwidth = [400,40],
         header=dict(values=["Pregunta", "Promedio"],align='center',fill_color='#6ec63b',font=dict(color='white')),
         cells=dict(values=[preguntas, divididos],font_size=8,height=40),
     ),layout=layout)
