@@ -33,9 +33,11 @@ def index(request):
 def inventoryList(request):
     if validarToken():
         inventories=Inventory.objects.all()
-        filtro=OrderFilter(request.GET,queryset=inventories)
+        filtro=CodeFiltro(request.GET,queryset=inventories)
         inventories=filtro.qs
-        context={"title":"Lista Inventario","inventories":inventories,"filtro":filtro}
+        filtroD=DescripcionFiltro(request.GET,queryset=inventories)
+        inventories=filtroD.qs
+        context={"title":"Lista Inventario","inventories":inventories,"filtro":filtro,"filtroD":filtroD}
         return render(request,"Inventario/listaProductos.html",context=context)
     else:
         messages.warning(request,"EL TOKEN DE LAUDUS A EXPIRADO , CONTACTA A UN PROGRAMADOR")
@@ -119,7 +121,7 @@ def inventarioList(request):
         inventario=Inventory.objects.all()
         filtro=BodegaFiltro(request.GET,queryset=inventario)
         inventario=filtro.qs
-        filtroPro=OrderFilter(request.GET,queryset=inventario)
+        filtroPro=CodeFiltro(request.GET,queryset=inventario)
         inventario=filtroPro.qs
         context={"title":"Lista Inventario","inventario":inventario,"filtro":filtro,"filtroPro":filtroPro}
         return render(request,"Inventario/inventarioList.html",context=context)

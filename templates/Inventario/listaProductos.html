@@ -10,24 +10,41 @@
         <div class="col-md-8">
             <h2>Productos</h2>
         </div>
-        <div class="col-md-4 text-right">
+        <div class="col-md-4" style="text-align: right;">
             <a href="{% url 'add' %}" class="btn btn-success btn-xl mb-2 ">Añadir</a>
             <a class="btn btn-danger btn-xl mb-2"
                 href="{% url 'previous_view' %}?prev={{ request.resolver_match.url_name }}">Volver</a>
         </div>
     </div>
-    <div class="col">
-        <div class="card-body">
-            <form method="get">
-                {% for field in filtro.form %}
-                <div class="form-group">
-                    {{ field.label_tag }}
-                    {{ field}}
-                </div>
-                <br>
-                {% endfor %}
-                <button class="btn btn-primary btn-sm mb-2" type="submit">Buscar</button>
-            </form>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card-body">
+                <form method="get">
+                    {% for field in filtro.form %}
+                    <div class="form-group form-group-lg">
+                        {{ field.label_tag }}
+                        {{ field}}
+                    </div>
+                    <br>
+                    {% endfor %}
+                    <button class="btn btn-primary btn-sm mb-2" type="submit">Buscar</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-body">
+                <form method="get">
+                    {% for field in filtroD.form %}
+                    <div class="form-group form-group-lg">
+                        {{ field.label_tag }}
+                        {{ field}}
+                    </div>
+                    <br>
+                    {% endfor %}
+                    <button class="btn btn-primary btn-sm mb-2" type="submit">Buscar</button>
+                </form>
+            </div>
         </div>
     </div>
     <table class="table table-striped table-bordered table-hoved table-dark table-responsive text-center"
