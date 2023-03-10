@@ -235,7 +235,7 @@ def leer(csvFile,encuestasFile,codigo):
         
         if i == len(dfPartsPorcentaje) - 1:
             part.loc[len(part)] = ['Total', total_alumnos, '100%']
-            fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
+            fill_colors[-2] = 'paleturquoise'  # Cambiar color de fondo de la última fila
             
         
         fig = go.Figure(data=[

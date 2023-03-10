@@ -5,7 +5,7 @@
     <img src="{% static 'assets/image/fondo.png' %}" alt="" style="width: 100%;;">
     <br>
     <div id="label"></div>
-    <h2 style="text-align: center;" class="mt-5">Diplomas</h2>
+    <h2 style="text-align: center;" class="mt-5" id="diplomas">Diplomas</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
@@ -52,6 +52,7 @@
     var intervalId;
     var contador = 0
     function typeMessage() {
+        document.getElementById("diplomas").style.display = "none";
         showOverlay()
         if (messageIndex < messages.length) {
             messageText = messages[messageIndex];
@@ -75,5 +76,7 @@
     }
     document.getElementById("boton").addEventListener("click", typeMessage);
     hideOverlay()
+    document.getElementById("diplomas").style.display = "block";
+
 </script>
 {% endblock %}
