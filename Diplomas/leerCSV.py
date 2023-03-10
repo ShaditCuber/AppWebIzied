@@ -231,18 +231,19 @@ def leer(csvFile,encuestasFile,codigo):
         partesP=1
     dfPartsPorcentaje = np.array_split(table, int(partesP))
     for i, part in enumerate(dfPartsPorcentaje):
-          # Color de fondo para filas pares e impares
+        fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(table))]  # Color de fondo para filas pares e impares
         
         if i == len(dfPartsPorcentaje) - 1:
             part.loc[len(part)] = ['Total', total_alumnos, '100%']
+            fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
             
-        fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(table))]
-        fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
+        cell_colors = [fill_colors] * len(part.columns)
+        
         fig = go.Figure(data=[
                                 go.Table(
                                     header=dict(values=list(part.columns),align='center',fill_color='#6ec63b',font=dict(color='white',family='Open Sans')),
                                     cells=dict(values=part.values.transpose(),
-                                            fill_color=[fill_colors],
+                                            fill_color=[cell_colors],
                                             align='center'
                                             )
                                         )
