@@ -16,7 +16,7 @@ BUCKET_KEY = 'informes-diplomas'
 s3_client = boto3.client('s3')
 KEY='eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjUyNzcwNCwidWlkIjoyNTE1MDE3NCwiaWFkIjoiMjAyMi0xMC0xN1QyMzowMzoxMy4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.p4MW-Jjxo8GGKLfJ_Fif5EpYscJahLg9BXeNtj1GSXI'
 mon=MondayClient(KEY)
-
+BOARD_ID='3549229417'
 def dataframe_to_lists(df):
     data = []
     # Agregar encabezados
@@ -31,7 +31,7 @@ def leer(csvFile,encuestasFile,codigo):
     
     fila=None
     try:
-       fila= mon.items.fetch_items_by_column_value('3549229417','name',codigo)['data']['items_by_column_values'][0]['id']
+       fila= mon.items.fetch_items_by_column_value(BOARD_ID,'name',codigo)['data']['items_by_column_values'][0]['id']
     except:
         pass
     
@@ -167,11 +167,7 @@ def leer(csvFile,encuestasFile,codigo):
     merger.write(diplomas)
     merger.close()     
     mon.items.add_file_to_column(fila,'archivo2',diplomas)
-    
     dfSinRut = dfOriginal.drop('rut', axis=1)
-    # import dataframe_image as dfi
-    # dfi.export(df, "df.png", dpi = 600)
-
     dfSinRut.columns = ['Nombres', 'Nota']
     cantidad=len(dfOriginal. index)
     partes=cantidad/12
@@ -186,11 +182,13 @@ def leer(csvFile,encuestasFile,codigo):
         fill_colors = ['lavender' if i%2==0 else 'white' for i in range(len(part))]  # Color de fondo para filas pares e impares
         layout = Layout(
         paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)'
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(family='Open Sans')
         )
+        
         fig = go.Figure(data=[
                             go.Table(
-                                header=dict(values=list(part.columns),align='center',fill_color='#6ec63b',font=dict(color='white')),
+                                header=dict(values=list(part.columns),align='center',fill_color='#6ec63b',font=dict(color='white',family='Open Sans')),
                                 cells=dict(values=part.values.transpose(),
                                         fill_color=[fill_colors],
                                         align='center'
@@ -228,7 +226,7 @@ def leer(csvFile,encuestasFile,codigo):
             fill_colors[-1] = 'paleturquoise'  # Cambiar color de fondo de la última fila
         fig = go.Figure(data=[
                                 go.Table(
-                                    header=dict(values=list(part.columns),align='center',fill_color='#6ec63b',font=dict(color='white')),
+                                    header=dict(values=list(part.columns),align='center',fill_color='#6ec63b',font=dict(color='white',family='Open Sans')),
                                     cells=dict(values=part.values.transpose(),
                                             fill_color=[fill_colors],
                                             align='center'
@@ -347,7 +345,8 @@ def leer(csvFile,encuestasFile,codigo):
     pdf1 = FPDF()
     pdf1.add_page()
     #eliminar pkl antes de subir a git uwu para no tenr problemas con las fuentes
-    pdf1.image(base_dir + '\\base\\backgroundnohand.png', x = 0, y = 0, w = 210, h = 297)
+    backgroundNoHand=os.path.join(base_dir,'base','backgroundnohand.png')
+    pdf1.image(backgroundNoHand, x = 0, y = 0, w = 210, h = 297)
     leaguePath=os.path.join(base_dir,'fonts','league-spartan','LeagueSpartan-Bold.ttf')
     openPath=os.path.join(base_dir,'fonts','Open_Sans','OpenSans-Light.ttf')
     
@@ -421,14 +420,18 @@ def leer(csvFile,encuestasFile,codigo):
         fill = False)
 
 
-    encuesta=ocr('./tmp/'+encuestasFile)
+    encuesta,promedioCurso,promedioRelator=ocr('./tmp/'+encuestasFile)
+    mon.items.change_item_value(BOARD_ID,fila,'n_meros1',promedioCurso)
+    mon.items.change_item_value(BOARD_ID,fila,'numeric',promedioRelator)
+
     for i in encuesta:
         figs.append(i)
     
-    
+    background=os.path.join(base_dir,'base','background.png')
     for tabla in figs:
         pdf1.add_page(orientation='P')
-        pdf1.image(base_dir + '\\base\\background.png', x = 0, y = 0, w = 210, h = 297)
+        # pdf1.image(background, x = 0, y = 0, w = 210, h = 297)
+        pdf1.image(background, x = 0, y = 0, w = 113, h = 200)
         pdf1.set_font('leagueSpartan','',28)
         pdf1.set_xy(12,42)
         if tabla.endswith('Encuesta.png'):
@@ -455,22 +458,21 @@ def leer(csvFile,encuestasFile,codigo):
     merger.append(base_dir+'/base/portada.pdf')
     merger.append("./tmp/generado.pdf")
     merger.append(base_dir+'/base/contraportada.pdf')
-    merger.write("./tmp/Informe.pdf")
+    informe="./tmp/Informe.pdf"
+    merger.write(informe)
     merger.close()
-    mon.items.add_file_to_column(fila,'dup__of_orden_de_compra',diplomas)
+    mon.items.add_file_to_column(fila,'dup__of_orden_de_compra',informe)
     
-    # from shutil import rmtree
-    # rmtree('./tmp/')
-    # dir = './tmp/'
-    # for f in os.listdir(dir):
-    #     os.remove(os.path.join(dir, f))
+
+    direc = './tmp/'
+    for f in os.listdir(direc):
+        os.remove(os.path.join(direc, f))
     return 200
 
 
 
     
 
-    
     
     
     

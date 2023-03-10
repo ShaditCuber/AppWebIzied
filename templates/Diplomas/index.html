@@ -8,9 +8,13 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" id="boton">Cargar archivo</button>
+        <a type="submit" id="boton" class="btn btn-primary btn-sm mb-2">Cargar archivo</a>
     </form>
-    <div id="overlay"></div>
+    <div id="overlay">
+        <p id="loading-text"></p>
+    </div>
+
+
 
 </div>
 <script>
@@ -21,8 +25,43 @@
     function hideOverlay() {
         document.getElementById("overlay").style.display = "none";
     }
+    var messages = [
+        "Armando cohete espacial",
+        "Subiendo archivos a la NASA",
+        "Descargando archivos de dinosaurios",
+        "Buscando señal extraterrestre",
+        "Entrenando monos para misiones espaciales",
+        "Revisando gravedad cero",
+        "Programando robots exploradores",
+        "Calculando trayectorias interplanetarias",
+        "Preparando trajes espaciales",
+        "Comprobando sistemas de soporte vital"
+    ];
 
-  // Llamamos a showOverlay() cuando el usuario hace clic en un botón o enlace que carga algo.
-  // Llamamos a hideOverlay() cuando la carga ha terminado (por ejemplo, cuando se completa una petición AJAX).
+    var messageIndex = 0;
+    var messageText = "";
+    var intervalId;
+
+    function typeMessage() {
+        showOverlay()
+        if (messageIndex < messages.length) {
+            messageText = messages[messageIndex];
+            var messageElement = document.getElementById("loading-text");
+            messageElement.innerHTML = "";
+            var i = 0;
+            intervalId = setInterval(function () {
+                if (i < messageText.length) {
+                    messageElement.innerHTML += messageText.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(intervalId);
+                    messageIndex++;
+                    setTimeout(typeMessage, 2000);
+                }
+            }, 100);
+        }
+    }
+    document.getElementById("boton").addEventListener("click", typeMessage);
+    hideOverlay()
 </script>
 {% endblock %}

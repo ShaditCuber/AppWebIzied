@@ -30,7 +30,7 @@ def index(request):
                     pass
                 if file.name.endswith('.csv'):
                     csvFile=file.name
-                if file.name.endswith('.pdf'):
+                if file.name.lower().endswith('.pdf'):
                     encuestasFile=file.name
             
             if csvFile and encuestasFile:

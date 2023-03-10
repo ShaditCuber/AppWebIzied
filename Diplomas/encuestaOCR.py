@@ -208,7 +208,7 @@ def ocr(ruta):
             exit() 
 
 
-    divididos = [value / cantidadEncuestas for value in resp.values()]
+    divididos = [round(value / cantidadEncuestas, 2) for value in resp.values()]
     print(cantidadEncuestas)
     # import pandas as pd
     # df = pd.DataFrame([[key, resp[key]] for key in resp.keys()], columns=['Pregunta', 'Promedio'])
@@ -224,8 +224,8 @@ def ocr(ruta):
     label=y
     # creación de gráfico de barras
     yLabel = [f'{val}%' for val in label]
-    x_labels = ["pregunta 1", "pregunta 2", "pregunta 3", "pregunta 4", "pregunta 5",
-                "pregunta 6", "pregunta 7", "pregunta 8", "pregunta 9", "pregunta 10","pregunta 11"]
+    x_labels = ["Pregunta 1", "Pregunta 2", "Pregunta 3", "Pregunta 4", "Pregunta 5",
+                "Pregunta 6", "Pregunta 7", "Pregunta 8", "Pregunta 9", "Pregunta 10","Pregunta 11"]
 
     figs=[]
     layout = Layout(
@@ -254,5 +254,6 @@ def ocr(ruta):
     fig.update_layout(title='Tabla Promedio por Pregunta',title_x=.5)
     fig.write_image(name,scale=6)
     figs.append(name)
-    
-    return figs
+    promedioCurso=sum(divididos) / 11
+    promedioRelator=(divididos[3]+divididos[4]+divididos[5])/3
+    return figs,promedioCurso,promedioRelator

@@ -30,6 +30,19 @@
       display: none;
     }
 
+    #loading-text {
+      position: absolute;
+      bottom: 340px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #000;
+      font-size: 20px;
+      letter-spacing: 2px;
+      font-weight: 900;
+    }
+
+
     #overlay:after {
       content: "";
       display: block;
@@ -40,7 +53,7 @@
       height: 100px;
       margin: -50px 0 0 -50px;
       border-radius: 50%;
-      border: 3px solid #fff;
+      border: 15px solid #0f4;
       border-top-color: #4e4e4e;
       animation: spin 1s linear infinite;
     }
@@ -54,7 +67,7 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
+  <nav class="navbar navbar-dark navbar-expand-lg bg-dark fixed-top">
     <div class="container-fluid">
       <a class="navbar-brand" href="/">Izied</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
