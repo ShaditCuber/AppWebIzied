@@ -165,7 +165,8 @@ def leer(csvFile,encuestasFile,codigo):
         
     diplomas=f'./tmp/{codigo}/Diplomas.pdf'
     merger.write(diplomas)
-    merger.close()     
+    merger.close()
+    print('Subiendo Diplomas')     
     mon.items.add_file_to_column(fila,'archivo2',diplomas)
     dfSinRut = dfOriginal.drop('rut', axis=1)
     dfSinRut.columns = ['Nombres', 'Nota']

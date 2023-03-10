@@ -8,7 +8,7 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <a type="submit" id="boton" class="btn btn-primary btn-sm mb-2">Cargar archivo</a>
+        <button type="submit" id="boton" class="btn btn-primary btn-sm mb-2">Cargar archivo</button>
     </form>
     <div id="overlay">
         <p id="loading-text"></p>
