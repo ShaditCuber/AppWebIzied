@@ -77,9 +77,9 @@
     document.getElementById("boton").addEventListener("click", function () {
         // Obtener el campo de entrada de archivos
         var fileInput = document.getElementById("id_archivo");
-
+        var miInput = document.getElementById("id_codigoPro");
         // Verificar si el campo de entrada de archivos tiene un archivo cargado
-        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+        if (fileInput && fileInput.files && fileInput.files.length > 0 && miInput.value !== "") {
             // Si hay archivos cargados, realizar la acción
             typeMessage();
         }
