@@ -233,7 +233,63 @@ def dashboard(request):
 
 
 def registroPresencial(request):
-    return render(request,"Inventario/registroPresencial.html")
+    if request.method=="POST":
+        pro = request.POST.get('pro')
+        fecha_salida = request.POST.get('date')
+        relator = request.POST.get('relator')
+        maleta = request.POST.get('maleta')
+
+        print(pro)
+        print(fecha_salida)
+        print(relator)
+        print(maleta)
+
+        if 'True' in request.POST.getlist('data'):
+            # Se ha seleccionado el checkbox 'Data'
+            cantidad = request.POST.get('data_cantidad')
+            # ...
+            print(cantidad,' datas')
+            
+        if 'True' in request.POST.getlist('monitor'):
+            # Se ha seleccionado el checkbox 'Monitor de signos'
+            # ...
+            print('Monitor')
+            
+        if 'True' in request.POST.getlist('notebook'):
+            # Se ha seleccionado el checkbox 'Notebook'
+            # ...
+            print('Note')
+            
+        if 'True' in request.POST.getlist('carpetas'):
+            # Se ha seleccionado el checkbox 'Carpetas'
+            cantidad = request.POST.get('carpetas_cantidad')
+            # ...
+            print(cantidad,' carpetas')
+            
+        if 'True' in request.POST.getlist('lapices'):
+            # Se ha seleccionado el checkbox 'Lápices'
+            cantidad = request.POST.get('lapices_cantidad')
+            # ...
+            print(cantidad,' lapices')
+            
+            
+        if 'True' in request.POST.getlist('dea'):
+            # Se ha seleccionado el checkbox 'DEA'
+            cantidad = request.POST.get('dea_cantidad')
+            # ...
+            print(cantidad,' dea')
+            
+        
+        
+        
+        
+    maletas = Inventory.objects.filter(resume__icontains='maleta').values_list('resume', flat=True)
+    productos = Inventory.objects.all().values_list('resume', flat=True)
+    
+    context={"relatores":['1','2','3'],"maletas":maletas,"productos":productos}
+    return render(request,"Inventario/registroPresencial.html",context=context)
+
+
 
 def informe_diplomas(request):
     return render(request,"Inventario/index.html")

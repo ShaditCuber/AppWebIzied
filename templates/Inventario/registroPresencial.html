@@ -5,14 +5,92 @@
     <h2 style="text-align: center;">Registro Presencial</h2>
 
 
+    <form method="post">
+        <div class="form-group form-group-lg">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="pro" class="form-label">Pro :</label>
+                <input type="text" name="pro" id="pro" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="fecha_salida" class="form-label">Fecha Salida :</label>
+                <input type="date" name="date" id="fecha_salida" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="relator" class="form-label">Relator</label>
+                <select name="relator" id="relator" class="form-select">
+                    <option selected>Seleccione un Relator</option>
+                    {% for relator in relatores %}
+                    <option value="{{ forloop.counter }}">{{relator}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="maleta" class="form-label">Maleta</label>
+                <select name="maleta" id="maleta" class="form-select">
+                    <option selected>Seleccione una Maleta</option>
+                    {% for maleta in maletas %}
+                    <option value="{{ forloop.counter }}">{{maleta}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="True" id="data" name="data">
+                    <label class="form-check-label" for="data">
+                        Data
+                    </label>
+                    <input class="" type="number" name="data_cantidad">
 
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="True" id="monitor" name="monitor">
+                    <label class="form-check-label" for="monitor">
+                        Monitor de signos
+                    </label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="True" id="notebook" name="notebook">
+                    <label class="form-check-label" for="notebook">
+                        Notebook
+                    </label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="True" id="carpetas" name="carpetas">
+                    <label class="form-check-label" for="carpetas">
+                        Carpetas
+                    </label>
+                    <input class="" type="number" name="carpetas_cantidad">
+                </div>
 
+            </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="True" id="lapices" name="lapices">
+                    <label class="form-check-label" for="lapices">
+                        Lápices
+                    </label>
+                    <input class="" type="number" name="lapices_cantidad">
+                </div>
 
+            </div>
 
-
-
-
-
-    fsdfhydstgfjhsdgfjhkdsgfjhsgjkfds
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="True" id="dea" name="dea">
+                    <label class="form-check-label" for="dea">
+                        DEA
+                    </label>
+                    <input class="" type="number" name="dea_cantidad">
+                </div>
+            </div>
+            <button class="btn btn-primary btn-sm mb-2" type="submit">Añadir</button>
+    </form>
 </div>
 {% endblock %}

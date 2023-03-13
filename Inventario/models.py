@@ -41,4 +41,5 @@ class Stock(models.Model):
     date_updated = models.DateTimeField(auto_now=True,blank=True,null=False)
     pro=models.CharField(max_length=100,null=False,blank=False,default="")
     
-    
+
+
