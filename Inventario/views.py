@@ -9,7 +9,11 @@ import plotly
 import plotly.express as px
 import json
 from .laudus import *
+import datetime
 import pytz
+from monday import MondayClient
+KEY='eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjUyNzcwNCwidWlkIjoyNTE1MDE3NCwiaWFkIjoiMjAyMi0xMC0xN1QyMzowMzoxMy4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6NjQwOTE1NCwicmduIjoidXNlMSJ9.p4MW-Jjxo8GGKLfJ_Fif5EpYscJahLg9BXeNtj1GSXI'
+mon=MondayClient(KEY)
 # Create your views here.
 now_utc = datetime.datetime.now(datetime.timezone.utc)
 # Ajustar a la zona horaria de Chile
@@ -232,52 +236,83 @@ def dashboard(request):
     return render(request,"Inventario/dashboard.html", context=context)
 
 
+
+def obtenerRelatores(pro):
+    BOARD_ID='3667934365'
+    COLUMN_ID='name'
+    data=mon.items.fetch_items_by_column_value(BOARD_ID, COLUMN_ID, pro)['data']['items_by_column_values'][0]['column_values']
+    relatores=None
+    fecha=None
+    for i in data:
+        if i['id']=='dup__of_celular_encargado':
+            relatores=i['text']
+        if i['id']=='dup__of_dup__of_reflejo':
+            fecha=i['text']
+
+    if relatores and fecha:
+        return relatores.split(','),fecha
+    else:
+        return None
+
 def registroPresencial(request):
+    show=False
+    pro=None
+    relatores=None
+    fecha=None
+    if request.method=="GET" and request.GET.get('pro')!=None:
+        pro = request.GET.get('pro')
+        show=True
+        relatores,fecha=obtenerRelatores(pro)
+        if relatores and fecha:
+            pass
+        else:
+            messages.warning(request,'No se encontraron relatores')
+            redirect('registro')
     if request.method=="POST":
-        pro = request.POST.get('pro')
+        pro = request.GET.get('pro')
         fecha_salida = request.POST.get('date')
         relator = request.POST.get('relator')
         maleta = request.POST.get('maleta')
 
-        print(pro)
-        print(fecha_salida)
+        print('Salida perteneciente a :'+pro)
+        print('Fecha Salida: ' +fecha_salida)
+        print('Fecha Curoso '+fecha)
         print(relator)
         print(maleta)
 
         if 'True' in request.POST.getlist('data'):
             # Se ha seleccionado el checkbox 'Data'
-            cantidad = request.POST.get('data_cantidad')
-            # ...
-            print(cantidad,' datas')
+            print('Se lleva un data')
             
         if 'True' in request.POST.getlist('monitor'):
             # Se ha seleccionado el checkbox 'Monitor de signos'
             # ...
-            print('Monitor')
+            print('Se lleva un Monitor')
             
         if 'True' in request.POST.getlist('notebook'):
             # Se ha seleccionado el checkbox 'Notebook'
             # ...
-            print('Note')
+            print('Se lleva un Note')
             
         if 'True' in request.POST.getlist('carpetas'):
             # Se ha seleccionado el checkbox 'Carpetas'
             cantidad = request.POST.get('carpetas_cantidad')
             # ...
-            print(cantidad,' carpetas')
+            print('Se lleva ',cantidad,' de carpetas')
             
         if 'True' in request.POST.getlist('lapices'):
             # Se ha seleccionado el checkbox 'Lápices'
             cantidad = request.POST.get('lapices_cantidad')
             # ...
-            print(cantidad,' lapices')
+            print('Se lleva ',cantidad,' de lapices')
+            
             
             
         if 'True' in request.POST.getlist('dea'):
             # Se ha seleccionado el checkbox 'DEA'
             cantidad = request.POST.get('dea_cantidad')
             # ...
-            print(cantidad,' dea')
+            print('Se lleva ',cantidad,' de dea')
             
         
         
@@ -286,7 +321,7 @@ def registroPresencial(request):
     maletas = Inventory.objects.filter(resume__icontains='maleta').values_list('resume', flat=True)
     productos = Inventory.objects.all().values_list('resume', flat=True)
     
-    context={"relatores":['1','2','3'],"maletas":maletas,"productos":productos}
+    context={"relatores":relatores,"maletas":maletas,"productos":productos,"show_second_form":show,"pro":pro,"productos":productosCheck}
     return render(request,"Inventario/registroPresencial.html",context=context)
 
 

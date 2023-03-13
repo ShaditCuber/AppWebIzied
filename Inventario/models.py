@@ -43,3 +43,20 @@ class Stock(models.Model):
     
 
 
+# class maleta():
+#     fk Inventory
+#     contains inventaroy
+#     relator
+#     pro
+#     fecha
+#     fecha curso
+    
+class RegistroPresencial(models.Model):
+    maleta = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    productos = models.ManyToManyField(Inventory, related_name='productos_usados')
+    relator = models.TextField()
+    pro = models.TextField()
+    fecha_salida = models.DateField()
+    fecha_curso = models.DateField()
+
+    

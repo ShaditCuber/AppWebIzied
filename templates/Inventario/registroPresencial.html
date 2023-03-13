@@ -4,13 +4,35 @@
 <div class="content-section">
     <h2 style="text-align: center;">Registro Presencial</h2>
 
+    {% if not show_second_form %}
+    <!-- Mostrar solo el campo Pro y el botón de búsqueda si show_second_form es False -->
+    <form method="GET">
+        <div class="form-group form-group-lg">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="pro" class="form-label">Pro :</label>
+                <input type="text" name="pro" id="pro" class="form-control" value="{{ pro_value }}">
+            </div>
+            <button class="btn btn-primary btn-sm mb-2" type="submit">Buscar</button>
+        </div>
+    </form>
+    {{ productos.as_p}}
+    <div id="cantidad-inputs"></div>
 
+
+    {% else %}
+    <!-- Mostrar el formulario completo si show_second_form es True -->
     <form method="post">
         <div class="form-group form-group-lg">
             {% csrf_token %}
             <div class="mb-3">
                 <label for="pro" class="form-label">Pro :</label>
+                {% if pro %}
+                <input type="text" name="pro" id="pro" class="form-control" value="{{pro}}">
+                {% else %}
                 <input type="text" name="pro" id="pro" class="form-control">
+
+                {% endif %}
             </div>
             <div class="mb-3">
                 <label for="fecha_salida" class="form-label">Fecha Salida :</label>
@@ -40,7 +62,6 @@
                     <label class="form-check-label" for="data">
                         Data
                     </label>
-                    <input class="" type="number" name="data_cantidad">
 
                 </div>
             </div>
@@ -62,35 +83,91 @@
             </div>
             <div class="mb-3">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="True" id="carpetas" name="carpetas">
+                    <input class="form-check-input producto" type="checkbox" value="True" id="carpetas" name="carpetas">
                     <label class="form-check-label" for="carpetas">
                         Carpetas
                     </label>
-                    <input class="" type="number" name="carpetas_cantidad">
+                    <input class="carpetas_cantidad" type="number" name="carpetas_cantidad">
                 </div>
 
             </div>
             <div class="mb-3">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="True" id="lapices" name="lapices">
+                    <input class="form-check-input producto" type="checkbox" value="True" id="lapices" name="lapices">
                     <label class="form-check-label" for="lapices">
                         Lápices
                     </label>
-                    <input class="" type="number" name="lapices_cantidad">
+                    <input class="lapices_cantidad" type="number" name="lapices_cantidad">
                 </div>
 
             </div>
 
             <div class="mb-3">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="True" id="dea" name="dea">
+                    <input class="form-check-input producto" type="checkbox" value="True" id="dea" name="dea">
                     <label class="form-check-label" for="dea">
                         DEA
                     </label>
-                    <input class="" type="number" name="dea_cantidad">
+                    <input class="dea_cantidad" type="number" name="dea_cantidad">
                 </div>
             </div>
-            <button class="btn btn-primary btn-sm mb-2" type="submit">Añadir</button>
+            <button class="btn btn-primary btn-sm mt-5" type="submit">Añadir</button>
     </form>
+    {% endif %}
 </div>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('input[type="checkbox"]').change(function () {
+            if (this.checked) {
+                var input_html = '<input type="number" name="cantidad-' + this.value + '" placeholder="' + this.value + '" min="1" required>';
+                $('#cantidad-inputs').append(input_html);
+            } else {
+                $('input[name="cantidad-' + this.value + '"]').remove();
+            }
+        });
+    });
+</script> -->
+<script>
+    // Obtener las casillas de verificación y los campos de cantidad correspondientes
+    const carpetasCheck = document.getElementById('carpetas');
+    const lapicesCheck = document.getElementById('lapices');
+    const deaCheck = document.getElementById('dea');
+    const carpetasCantidad = document.querySelector('.carpetas_cantidad');
+    const lapicesCantidad = document.querySelector('.lapices_cantidad');
+    const deaCantidad = document.querySelector('.dea_cantidad');
+
+    // Ocultar los campos de cantidad por defecto
+    carpetasCantidad.style.display = 'none';
+    lapicesCantidad.style.display = 'none';
+    deaCantidad.style.display = 'none';
+
+
+    // Función para mostrar/ocultar los campos de cantidad según el estado de las casillas de verificación
+    function actualizarCamposCantidad() {
+        if (carpetasCheck.checked) {
+            carpetasCantidad.style.display = 'block';
+        } else {
+            carpetasCantidad.style.display = 'none';
+        }
+
+        if (lapicesCheck.checked) {
+            lapicesCantidad.style.display = 'block';
+        } else {
+            lapicesCantidad.style.display = 'none';
+        }
+        if (deaCheck.checked) {
+            deaCantidad.style.display = 'block';
+        } else {
+            deaCantidad.style.display = 'none';
+        }
+    }
+
+    // Ejecutar la función al cargar la página y cada vez que se cambia el estado de una casilla de verificación
+    actualizarCamposCantidad();
+    carpetasCheck.addEventListener('change', actualizarCamposCantidad);
+    lapicesCheck.addEventListener('change', actualizarCamposCantidad);
+    deaCheck.addEventListener('change', actualizarCamposCantidad);
+
+</script>
 {% endblock %}

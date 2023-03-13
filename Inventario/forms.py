@@ -113,3 +113,21 @@ class addInventario(ModelForm):
         model = Stock
         fields = ["producto", "cantidad","type","pro"]
         help_texts ={k:"" for k in fields}
+
+
+class Custom(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, producto):
+        return "%s" % producto.resume+' - '+producto.code
+    
+class productosCheck(ModelForm):
+    #ajustar query para obtener los que se necesitan
+    #Presencial x
+    #Presencial 2x
+    productos=Custom(
+        queryset=Inventory.objects.filter(idWarehouse=3),
+        widget=forms.CheckboxSelectMultiple
+        
+    )
+    class Meta:
+        model = Inventory
+        fields = ['productos']
